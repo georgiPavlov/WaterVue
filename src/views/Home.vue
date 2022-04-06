@@ -8,7 +8,6 @@ import {
   mdiFinance,
   mdiMonitorCellphone,
   mdiReload,
-  mdiGithub,
   mdiChartPie
 } from '@mdi/js'
 import * as chartConfig from '@/components/Charts/chart.config.js'
@@ -20,7 +19,6 @@ import CardWidget from '@/components/CardWidget.vue'
 import CardComponent from '@/components/CardComponent.vue'
 import ClientsTable from '@/components/ClientsTable.vue'
 import Notification from '@/components/Notification.vue'
-import JbButton from '@/components/JbButton.vue'
 import CardTransactionBar from '@/components/CardTransactionBar.vue'
 import CardClientBar from '@/components/CardClientBar.vue'
 import TitleSubBar from '@/components/TitleSubBar.vue'
@@ -43,60 +41,36 @@ const clientBarItems = computed(() => store.state.clients.slice(0, 3))
 
 const transactionBarItems = computed(() => store.state.history.slice(0, 3))
 
-const darkMode = computed(() => store.state.darkMode)
+const devices = computed(() => store.getters.allDevices)
+
+const selectedDevice = computed(() => store.getters.getCurrentDevice)
+
 </script>
 
 <template>
   <title-bar :title-stack="titleStack" />
   <hero-bar>Dashboard</hero-bar>
-  <main-section>
-    <notification
-      color="info"
-      :icon="mdiGithub"
-    >
-      Please star this project on
-      <a
-        href="https://github.com/justboil/admin-one-vue-tailwind"
-        class="underline"
-        target="_blank"
-      >GitHub</a>
-      <template #right>
-        <jb-button
-          href="https://github.com/justboil/admin-one-vue-tailwind"
-          :icon="mdiGithub"
-          :outline="darkMode"
-          label="GitHub"
-          target="_blank"
-          small
-        />
-      </template>
-    </notification>
-    <div class="grid grid-cols-1 gap-6 lg:grid-cols-3 mb-6">
+  <main-section v-if="devices.length !== 0">
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:h-96 mb-6">
       <card-widget
-        trend="12%"
-        trend-type="up"
         color="text-emerald-500"
         :icon="mdiAccountMultiple"
-        :number="512"
-        label="Clients"
+        :prefix="selectedDevice.label"
+        label="Device"
       />
       <card-widget
-        trend="12%"
-        trend-type="down"
         color="text-blue-500"
         :icon="mdiCartOutline"
-        :number="7770"
-        prefix="$"
-        label="Sales"
+        :number="selectedDevice.water_level"
+        suffix="%"
+        label="Water"
       />
       <card-widget
-        trend="Overflow"
-        trend-type="alert"
         color="text-red-500"
         :icon="mdiChartTimelineVariant"
-        :number="256"
+        :number="selectedDevice.moisture_level"
         suffix="%"
-        label="Performance"
+        label="Moisture"
       />
     </div>
 
@@ -164,5 +138,8 @@ const darkMode = computed(() => store.state.darkMode)
     >
       <clients-table />
     </card-component>
+  </main-section>
+  <main-section v-if="devices.length === 0">
+     <label class="block font-bold mb-2 bg-red-500">No device registered</label>
   </main-section>
 </template>

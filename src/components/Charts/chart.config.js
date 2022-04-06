@@ -10,7 +10,7 @@ const randomChartData = n => {
   const data = []
 
   for (let i = 0; i < n; i++) {
-    data.push(Math.round(Math.random() * 200))
+    data.push(Math.round(1))
   }
 
   return data
@@ -46,9 +46,7 @@ export const sampleChartData = (points = 9) => {
   return {
     labels,
     datasets: [
-      datasetObject('primary', points),
-      datasetObject('info', points),
-      datasetObject('danger', points)
+      datasetObject('primary', points)
     ]
   }
 }

@@ -2,6 +2,7 @@ import { createStore } from 'vuex'
 import axios from 'axios'
 import { darkModeKey, styleKey } from '@/config.js'
 import * as styles from '@/styles.js'
+import device from './modules/device'
 
 export default createStore({
   state: {
@@ -143,5 +144,6 @@ export default createStore({
     }
   },
   modules: {
+    device
   }
 })

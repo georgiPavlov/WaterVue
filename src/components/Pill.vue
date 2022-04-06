@@ -39,8 +39,8 @@ const componentClass = computed(() => {
     <icon
       v-if="icon"
       :path="icon"
-      h="h-4"
-      w="w-4"
+      h="h-6"
+      w="w-10"
       class="mr-2"
     />
     <span>{{ text }}</span>

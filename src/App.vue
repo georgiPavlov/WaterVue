@@ -17,6 +17,8 @@ store.commit('user', {
 
 const isAsideLgActive = computed(() => store.state.isAsideLgActive)
 
+store.dispatch('fetchDevices')
+
 const overlayClick = () => {
   store.dispatch('asideLgToggle', false)
 }

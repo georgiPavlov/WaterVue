@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useStore } from 'vuex'
 import {
   mdiForwardburger,
@@ -7,23 +7,18 @@ import {
   mdiClose,
   mdiDotsVertical,
   mdiMenu,
-  mdiClockOutline,
-  mdiCloud,
-  mdiCrop,
+  mdiDevices,
   mdiAccount,
   mdiCogOutline,
   mdiEmail,
   mdiLogout,
-  mdiGithub,
   mdiThemeLightDark
 } from '@mdi/js'
 import NavBarItem from '@/components/NavBarItem.vue'
 import NavBarItemLabel from '@/components/NavBarItemLabel.vue'
 import NavBarMenu from '@/components/NavBarMenu.vue'
 import Divider from '@/components/Divider.vue'
-import UserAvatar from '@/components/UserAvatar.vue'
 import Icon from '@/components/Icon.vue'
-import NavBarSearch from '@/components/NavBarSearch.vue'
 
 const store = useStore()
 
@@ -54,6 +49,21 @@ const menuNavBarToggle = () => {
 const menuOpenLg = () => {
   store.dispatch('asideLgToggle', true)
 }
+
+const allDevices = computed(() => store.getters.allDevices)
+
+onMounted(() => {
+  store.dispatch('initCurrentDevice')
+})
+
+const selectedDevice = computed(() => store.getters.getCurrentDevice)
+const selectedDeviceLabel = computed(() => selectedDevice.value === null ? 'None' : selectedDevice.value.label)
+
+const changeSelectedDevice = (deviceId) => {
+  const selection = computed(() => store.getters.getDeviceById(deviceId))
+  store.dispatch('setDeviceLabel', selection.value)
+}
+
 </script>
 
 <template>
@@ -82,9 +92,6 @@ const menuOpenLg = () => {
           size="24"
         />
       </nav-bar-item>
-      <nav-bar-item>
-        <nav-bar-search />
-      </nav-bar-item>
     </div>
     <div class="flex-none items-stretch flex h-14 lg:hidden">
       <nav-bar-item @click.prevent="menuNavBarToggle">
@@ -105,36 +112,28 @@ const menuOpenLg = () => {
         <nav-bar-menu has-divider>
           <nav-bar-item-label
             :icon="mdiMenu"
-            label="Sample menu"
-          />
-
+            label="Devices"
+            :show-device="true"
+            :device_select="selectedDeviceLabel"
+          >
+            <div />
+          </nav-bar-item-label>
           <template #dropdown>
-            <nav-bar-item>
-              <nav-bar-item-label
-                :icon="mdiClockOutline"
-                label="Item One"
-              />
-            </nav-bar-item>
-            <nav-bar-item>
-              <nav-bar-item-label
-                :icon="mdiCloud"
-                label="Item Two"
-              />
-            </nav-bar-item>
-            <divider nav-bar />
-            <nav-bar-item>
-              <nav-bar-item-label
-                :icon="mdiCrop"
-                label="Item Last"
-              />
-            </nav-bar-item>
+            <template
+              v-for="(device_el, index) in allDevices"
+              :key="index"
+            >
+              <nav-bar-item @click.prevent="changeSelectedDevice(device_el.device_id)">
+                <nav-bar-item-label
+                  :icon="mdiDevices"
+                  :label="device_el.label"
+                />
+              </nav-bar-item>
+            </template>
           </template>
         </nav-bar-menu>
         <nav-bar-menu has-divider>
-          <nav-bar-item-label :label="userName">
-            <user-avatar class="w-6 h-6 mr-3 inline-flex" />
-          </nav-bar-item-label>
-
+          <nav-bar-item-label :label="userName" />
           <template #dropdown>
             <nav-bar-item to="/profile">
               <nav-bar-item-label
@@ -171,17 +170,6 @@ const menuOpenLg = () => {
           <nav-bar-item-label
             :icon="mdiThemeLightDark"
             label="Light/Dark"
-            is-desktop-icon-only
-          />
-        </nav-bar-item>
-        <nav-bar-item
-          href="https://github.com/justboil/admin-one-vue-tailwind"
-          has-divider
-          is-desktop-icon-only
-        >
-          <nav-bar-item-label
-            :icon="mdiGithub"
-            label="GitHub"
             is-desktop-icon-only
           />
         </nav-bar-item>
