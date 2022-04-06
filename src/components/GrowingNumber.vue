@@ -58,5 +58,6 @@ onMounted(() => {
 </script>
 
 <template>
-  <div>{{ prefix }}{{ newValueFormatted }}{{ suffix }}</div>
-</template>s
+  <div v-if="newValueFormatted !== 0">{{ prefix }}{{ newValueFormatted }}{{ suffix }}</div>
+  <div v-if="newValueFormatted === 0">{{ prefix }}{{ suffix }}</div>
+</template>

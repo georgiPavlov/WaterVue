@@ -10,7 +10,15 @@ defineProps({
     type: String,
     required: true
   },
-  isDesktopIconOnly: Boolean
+  device_select: {
+    type: String,
+    default: 'no device registered'
+  },
+  isDesktopIconOnly: Boolean,
+  showDevice: {
+    type: Boolean,
+    default: false
+  }
 }
 )
 </script>
@@ -26,4 +34,9 @@ defineProps({
     class="px-2 transition-colors"
     :class="{ 'lg:hidden':isDesktopIconOnly && icon }"
   >{{ label }}</span>
+  <span
+    v-if="showDevice"
+    class="px-2 transition-colors"
+    :class="{ 'lg:hidden':isDesktopIconOnly && icon }"
+  >{{ device_select }}</span>
 </template>

@@ -1,7 +1,5 @@
 <script setup>
-import { mdiGithub } from '@mdi/js'
 import Level from '@/components/Level.vue'
-import JbButton from '@/components/JbButton.vue'
 
 defineProps({
   titleStack: {
@@ -24,13 +22,6 @@ defineProps({
           {{ title }}
         </li>
       </ul>
-      <jb-button
-        href="https://github.com/justboil/admin-one-vue-tailwind"
-        color="info"
-        label="Star on GitHub"
-        target="_blank"
-        :icon="mdiGithub"
-      />
     </level>
   </section>
 </template>
