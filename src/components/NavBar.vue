@@ -27,6 +27,13 @@ const lightBorderStyle = computed(() => store.state.lightBorderStyle)
 const toggleLightDark = () => {
   store.dispatch('darkMode')
 }
+store.dispatch('initCurrentDevice')
+
+onMounted(() => {
+  const device = computed(() => store.getters.getCurrentDevice)
+  console.log(device.value)
+  store.dispatch('fetchDeviceWaterCharts', device.value.device_id)
+})
 
 const isNavBarVisible = computed(() => !store.state.isFullScreen)
 
@@ -52,16 +59,13 @@ const menuOpenLg = () => {
 
 const allDevices = computed(() => store.getters.allDevices)
 
-onMounted(() => {
-  store.dispatch('initCurrentDevice')
-})
-
 const selectedDevice = computed(() => store.getters.getCurrentDevice)
 const selectedDeviceLabel = computed(() => selectedDevice.value === null ? 'None' : selectedDevice.value.label)
 
 const changeSelectedDevice = (deviceId) => {
   const selection = computed(() => store.getters.getDeviceById(deviceId))
   store.dispatch('setDeviceLabel', selection.value)
+  store.dispatch('fetchDeviceWaterCharts', selection.value.device_id)
 }
 
 </script>

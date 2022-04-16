@@ -6,7 +6,6 @@ import {
   mdiCartOutline,
   mdiChartTimelineVariant,
   mdiFinance,
-  mdiMonitorCellphone,
   mdiReload,
   mdiChartPie
 } from '@mdi/js'
@@ -17,29 +16,28 @@ import TitleBar from '@/components/TitleBar.vue'
 import HeroBar from '@/components/HeroBar.vue'
 import CardWidget from '@/components/CardWidget.vue'
 import CardComponent from '@/components/CardComponent.vue'
-import ClientsTable from '@/components/ClientsTable.vue'
-import Notification from '@/components/Notification.vue'
-import CardTransactionBar from '@/components/CardTransactionBar.vue'
-import CardClientBar from '@/components/CardClientBar.vue'
 import TitleSubBar from '@/components/TitleSubBar.vue'
+import CardWithButton from '@/components/CardWithButton'
 
-const titleStack = ref(['Admin', 'Dashboard'])
+const titleStack = ref(['Water System'])
 
-const chartData = ref(null)
+const chartData = ref([])
+
+const points = computed(() => store.getters.allDeviceWaterCharts)
+
+const toArrayPoints = computed(() => points.value.map(a => a.water_chart))
 
 const fillChartData = () => {
-  chartData.value = chartConfig.sampleChartData()
+  chartData.value = chartConfig.sampleChartData(10, toArrayPoints.value)
 }
+
+const fillChartsCompute = computed(() => fillChartData())
 
 onMounted(() => {
   fillChartData()
 })
 
 const store = useStore()
-
-const clientBarItems = computed(() => store.state.clients.slice(0, 3))
-
-const transactionBarItems = computed(() => store.state.history.slice(0, 3))
 
 const devices = computed(() => store.getters.allDevices)
 
@@ -51,12 +49,20 @@ const selectedDevice = computed(() => store.getters.getCurrentDevice)
   <title-bar :title-stack="titleStack" />
   <hero-bar>Dashboard</hero-bar>
   <main-section v-if="devices.length !== 0">
-    <div class="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:h-96 mb-6">
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:h-100 mb-6">
       <card-widget
         color="text-emerald-500"
         :icon="mdiAccountMultiple"
         :prefix="selectedDevice.label"
         label="Device"
+        :number="-1"
+      />
+      <card-widget
+        color="text-emerald-500"
+        :icon="mdiAccountMultiple"
+        :number="selectedDevice.water_container_capacity"
+        suffix="ml"
+        label="Water container capacity"
       />
       <card-widget
         color="text-blue-500"
@@ -72,44 +78,55 @@ const selectedDevice = computed(() => store.getters.getCurrentDevice)
         suffix="%"
         label="Moisture"
       />
+      <card-widget
+        color="text-emerald-500"
+        :icon="mdiAccountMultiple"
+        prefix="Success"
+        label="Status"
+        :number="-1"
+      />
+      <card-widget
+        color="text-emerald-500"
+        :icon="mdiAccountMultiple"
+        prefix="time plan 123"
+        label="Running plan"
+        :number="-1"
+      />
     </div>
 
-    <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-6">
-      <div class="flex flex-col justify-between">
-        <card-transaction-bar
-          v-for="(transaction,index) in transactionBarItems"
-          :key="index"
-          :amount="transaction.amount"
-          :date="transaction.date"
-          :business="transaction.business"
-          :type="transaction.type"
-          :name="transaction.name"
-          :account="transaction.account"
-        />
-      </div>
-      <div class="flex flex-col justify-between">
-        <card-client-bar
-          v-for="client in clientBarItems"
-          :key="client.id"
-          :name="client.name"
-          :login="client.login"
-          :date="client.created"
-          :progress="client.progress"
-        />
-      </div>
+    <div class="grid grid-cols-1  xl:grid-cols-2 lg:grid-cols-2 lg:h-100 xl:h-1/6 gap-6 mb-6">
+      <CardWithButton
+        key="index"
+        header="Water Reset"
+        message="Perform water reset"
+        type="transaction.type"
+        name="transaction.name"
+        account="transaction.account"
+        :show-button="true"
+        label="Reset"
+      />
+      <CardWithButton
+        key="index"
+        header="Email notification"
+        message="Enable or disable notification"
+        type="transaction.type"
+        name="transaction.name"
+        account="transaction.account"
+        :show-radio-button="true"
+      />
     </div>
 
     <title-sub-bar
       :icon="mdiChartPie"
-      title="Trends overview"
+      title="Last 10 watering executions"
     />
 
     <card-component
-      title="Performance"
+      title="Water"
       :icon="mdiFinance"
       :header-icon="mdiReload"
-      class="mb-6"
-      @header-icon-click="fillChartData"
+      class="mb-10"
+      @header-icon-click="fillChartsCompute"
     >
       <div v-if="chartData">
         <line-chart
@@ -118,28 +135,8 @@ const selectedDevice = computed(() => store.getters.getCurrentDevice)
         />
       </div>
     </card-component>
-
-    <title-sub-bar
-      :icon="mdiAccountMultiple"
-      title="Clients"
-    />
-
-    <notification
-      color="info"
-      :icon="mdiMonitorCellphone"
-    >
-      <b>Responsive table.</b> Collapses on mobile
-    </notification>
-
-    <card-component
-      :icon="mdiMonitorCellphone"
-      title="Responsive table"
-      has-table
-    >
-      <clients-table />
-    </card-component>
   </main-section>
   <main-section v-if="devices.length === 0">
-     <label class="block font-bold mb-2 bg-red-500">No device registered</label>
+    <label class="block font-bold mb-2 bg-red-500">No device registered</label>
   </main-section>
 </template>

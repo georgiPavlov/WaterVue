@@ -1,10 +1,12 @@
-import { createStore } from 'vuex'
+import Vuex from 'vuex'
 import axios from 'axios'
 import { darkModeKey, styleKey } from '@/config.js'
 import * as styles from '@/styles.js'
 import device from './modules/device'
+import createPersistedState from 'vuex-persistedstate'
 
-export default createStore({
+export default new Vuex.Store({
+  plugins: [createPersistedState()],
   state: {
     /* Styles */
     lightBorderStyle: '',

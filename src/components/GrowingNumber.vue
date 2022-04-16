@@ -13,7 +13,7 @@ const props = defineProps({
   },
   value: {
     type: Number,
-    default: 0
+    default: -1
   },
   duration: {
     type: Number,
@@ -58,6 +58,6 @@ onMounted(() => {
 </script>
 
 <template>
-  <div v-if="newValueFormatted !== 0">{{ prefix }}{{ newValueFormatted }}{{ suffix }}</div>
-  <div v-if="newValueFormatted === 0">{{ prefix }}{{ suffix }}</div>
+  <div v-if="newValueFormatted !== -1">{{ prefix }}{{ newValueFormatted }}{{ suffix }}</div>
+  <div v-if="newValueFormatted === -1">{{ prefix }}{{ suffix }}</div>
 </template>

@@ -6,17 +6,7 @@ export const chartColors = {
   }
 }
 
-const randomChartData = n => {
-  const data = []
-
-  for (let i = 0; i < n; i++) {
-    data.push(Math.round(1))
-  }
-
-  return data
-}
-
-const datasetObject = (color, points) => {
+const datasetObject = (color, points, d) => {
   return {
     fill: false,
     borderColor: chartColors.default[color],
@@ -30,13 +20,13 @@ const datasetObject = (color, points) => {
     pointHoverRadius: 4,
     pointHoverBorderWidth: 15,
     pointRadius: 4,
-    data: randomChartData(points),
+    data: d,
     tension: 0.5,
     cubicInterpolationMode: 'default'
   }
 }
 
-export const sampleChartData = (points = 9) => {
+export const sampleChartData = (points, data) => {
   const labels = []
 
   for (let i = 1; i <= points; i++) {
@@ -46,7 +36,7 @@ export const sampleChartData = (points = 9) => {
   return {
     labels,
     datasets: [
-      datasetObject('primary', points)
+      datasetObject('primary', points, data)
     ]
   }
 }

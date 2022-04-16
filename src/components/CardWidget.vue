@@ -86,9 +86,9 @@ const darkMode = computed(() => store.state.darkMode)
       <icon
         v-if="icon"
         :path="icon"
-        size="48"
+        size="100"
         w=""
-        h="h-16"
+        h="h-20"
         :class="color"
       />
     </level>

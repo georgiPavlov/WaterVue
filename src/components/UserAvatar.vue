@@ -17,9 +17,7 @@ const store = useStore()
 
 const lightBgStyle = computed(() => store.state.lightBgStyle)
 
-const avatar = computed(() => props.username
-  ? `https://avatars.dicebe1ar.com/${props.api}/${props.username.replace(/[^a-z0-9]+/i, '-')}.svg`
-  : 'https://upload.wikimedia.org/wikipedia/commons/9/9a/Gull_portrait_ca_usa.jpg')
+const avatar = computed(() => props.username ? '....' : '-')
 
 const name = computed(() => props.username ? props.username : store.state.userName)
 </script>
