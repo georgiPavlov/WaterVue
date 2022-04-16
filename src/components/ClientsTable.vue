@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, watch, ref, toRef } from 'vue'
 import { useStore } from 'vuex'
 import { mdiEye, mdiTrashCan } from '@mdi/js'
 import ModalBox from '@/components/ModalBox.vue'
@@ -7,10 +7,71 @@ import CheckboxCell from '@/components/CheckboxCell.vue'
 import Level from '@/components/Level.vue'
 import JbButtons from '@/components/JbButtons.vue'
 import JbButton from '@/components/JbButton.vue'
-import UserAvatar from '@/components/UserAvatar.vue'
 
-defineProps({
-  checkable: Boolean
+const props = defineProps({
+  checkable: Boolean,
+  itemTableColumns: {
+    type: Array,
+    default: () => [
+      {
+        column: 'purple',
+        field: 'minivan'
+      },
+      {
+        column: 'green',
+        field: 'car'
+      },
+      {
+        column: 'green1',
+        field: 'carq'
+      },
+      {
+        column: 'green1',
+        field: 'car1'
+      }
+    ]
+  },
+  updateFields: {
+    type: Array,
+    default: () => ['']
+  },
+  rows: {
+    type: Array,
+    required: true,
+    default: () => [{
+      device_id: '77',
+      label: 'gogi2',
+      water_level: 1000,
+      moisture_level: 0,
+      water_container_capacity: 2000,
+      water_reset: false
+    },
+    {
+      device_id: '888',
+      label: 'gogi',
+      water_level: 70,
+      moisture_level: 0,
+      water_container_capacity: 2000,
+      water_reset: true
+    },
+    {
+      device_id: '888',
+      label: 'gogi',
+      water_level: 70,
+      moisture_level: 0,
+      water_container_capacity: 2000,
+      water_reset: true
+    },
+    {
+      device_id: '888',
+      label: 'gogi',
+      water_level: 70,
+      moisture_level: 0,
+      water_container_capacity: 2000,
+      water_reset: true
+    }
+    ]
+  }
 })
 
 const store = useStore()
@@ -37,8 +98,15 @@ const currentPage = ref(0)
 
 const checkedRows = ref([])
 
+const barcodePulse = toRef(props, 'rows')
+
+watch(() => barcodePulse.value, () => {
+  console.log(barcodePulse.value)
+  console.log('in rows')
+})
+
 const itemsPaginated = computed(
-  () => items.value.slice(perPage.value * currentPage.value, perPage.value * (currentPage.value + 1))
+  () => barcodePulse.value.slice(perPage.value * currentPage.value, perPage.value * (currentPage.value + 1))
 )
 
 const numPages = computed(() => Math.ceil(items.value.length / perPage.value))
@@ -115,18 +183,19 @@ const checked = (isChecked, client) => {
       <tr>
         <th v-if="checkable" />
         <th />
-        <th>Name</th>
-        <th>Company</th>
-        <th>City</th>
-        <th>Progress</th>
-        <th>Created</th>
+        <th
+          v-for="(item, index) in itemTableColumns"
+          :key="index"
+        >
+          {{ item.column }}
+        </th>
         <th />
       </tr>
     </thead>
     <tbody>
       <tr
-        v-for="(client, index) in itemsPaginated"
-        :key="client.id"
+        v-for="(row, index) in itemsPaginated"
+        :key="index"
         :class="[tableTrStyle, index % 2 === 0 ? tableTrOddStyle : '']"
       >
         <checkbox-cell
@@ -135,35 +204,16 @@ const checked = (isChecked, client) => {
         />
         <td class="image-cell">
           <user-avatar
-            :username="client.name"
+            username="client.name"
             class="image"
           />
         </td>
-        <td data-label="Name">
-          {{ client.name }}
-        </td>
-        <td data-label="Company">
-          {{ client.company }}
-        </td>
-        <td data-label="City">
-          {{ client.city }}
-        </td>
         <td
-          data-label="Progress"
-          class="progress-cell"
+          v-for="(item, i) in itemTableColumns"
+          :key="i"
+          :data-label="item.column"
         >
-          <progress
-            max="100"
-            :value="client.progress"
-          >
-            {{ client.progress }}
-          </progress>
-        </td>
-        <td data-label="Created">
-          <small
-            class="text-gray-500 dark:text-gray-400"
-            :title="client.created"
-          >{{ client.created }}</small>
+          test
         </td>
         <td class="actions-cell">
           <jb-buttons

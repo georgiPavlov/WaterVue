@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, onBeforeMount } from 'vue'
 import { useStore } from 'vuex'
 import menu from '@/menu.js'
 import NavBar from '@/components/NavBar.vue'
@@ -15,10 +15,12 @@ store.commit('user', {
   avatar: 'https://avatars.dicebear.com/api/avataaars/example.svg?options[top][]=shortHair&options[accessoriesChance]=93'
 })
 
+onBeforeMount(() => {
+  store.dispatch('fetchDevices')
+  store.dispatch('initCurrentDevice')
+})
+
 const isAsideLgActive = computed(() => store.state.isAsideLgActive)
-
-store.dispatch('fetchDevices')
-
 const overlayClick = () => {
   store.dispatch('asideLgToggle', false)
 }
