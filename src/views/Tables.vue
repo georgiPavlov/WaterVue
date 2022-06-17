@@ -1,27 +1,58 @@
 <script setup>
-import { ref } from 'vue'
-import { mdiMonitorCellphone, mdiAccountMultiple } from '@mdi/js'
+import { ref, computed } from 'vue'
+import { mdiAccountMultiple } from '@mdi/js'
 import MainSection from '@/components/MainSection.vue'
-import Notification from '@/components/Notification.vue'
 import ClientsTable from '@/components/ClientsTable.vue'
 import CardComponent from '@/components/CardComponent.vue'
 import TitleBar from '@/components/TitleBar.vue'
 import HeroBar from '@/components/HeroBar.vue'
-import BottomOtherPagesSection from '@/components/BottomOtherPagesSection.vue'
+import JbButtons from '@/components/JbButtons.vue'
+import JbButton from '@/components/JbButton.vue'
+import Divider from '@/components/Divider.vue'
+import { useStore } from 'vuex'
+
+const store = useStore()
+
+// eslint-disable-next-line no-unused-vars
+const modalCreatePlanActive = computed(() => store.getters.getModalCreatePlanActive)
 
 const titleStack = ref(['Admin', 'Tables'])
+
+// eslint-disable-next-line no-unused-vars
+const modalCreatePlanActiveT = () => {
+  store.dispatch('modalCreatePlanActiveToggle')
+}
+
+const modalDeletePlanActiveT = () => {
+  store.dispatch('modalDeletePlanActiveToggle')
+}
+
 </script>
 
 <template>
   <title-bar :title-stack="titleStack" />
   <hero-bar>Tables</hero-bar>
   <main-section>
-    <notification
-      color="info"
-      :icon="mdiMonitorCellphone"
+    <jb-buttons
+      type="justify-start lg:justify-end"
+      no-wrap
     >
-      <b>Responsive table.</b> Collapses on mobile
-    </notification>
+      <jb-button
+        type="reset"
+        color="info"
+        outline
+        label="Create"
+        @click="modalCreatePlanActiveT"
+      />
+      <jb-button
+        type="reset"
+        color="danger"
+        outline
+        label="Delete"
+        @click="modalDeletePlanActiveT"
+      />
+    </jb-buttons>
+    <divider />
 
     <card-component
       class="mb-6"
@@ -33,5 +64,4 @@ const titleStack = ref(['Admin', 'Tables'])
     </card-component>
   </main-section>
 
-  <bottom-other-pages-section />
 </template>

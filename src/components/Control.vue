@@ -37,6 +37,7 @@ const props = defineProps({
     default: ''
   },
   required: Boolean,
+  readOnly: Boolean,
   borderless: Boolean,
   transparent: Boolean,
   ctrlKFocus: Boolean
@@ -146,6 +147,7 @@ if (props.ctrlKFocus) {
       :placeholder="placeholder"
       :type="computedType"
       :class="inputElClass"
+      :readonly="readOnly"
     >
     <control-icon
       v-if="icon"

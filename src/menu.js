@@ -30,6 +30,11 @@ export default [
       icon: mdiTable
     },
     {
+      to: '/devices',
+      label: 'Devices',
+      icon: mdiTable
+    },
+    {
       to: '/forms',
       label: 'Forms',
       icon: mdiSquareEditOutline

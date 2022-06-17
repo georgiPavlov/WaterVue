@@ -60,7 +60,12 @@ const menuOpenLg = () => {
 const allDevices = computed(() => store.getters.allDevices)
 
 const selectedDevice = computed(() => store.getters.getCurrentDevice)
-const selectedDeviceLabel = computed(() => selectedDevice.value === null ? 'None' : selectedDevice.value.label)
+const selectedDeviceLabel = computed(() => {
+  if (allDevices.value.length === 0) {
+    return 'None'
+  }
+  return selectedDevice.value === null ? 'None' : selectedDevice.value.label
+})
 
 const changeSelectedDevice = (deviceId) => {
   const selection = computed(() => store.getters.getDeviceById(deviceId))

@@ -5,7 +5,48 @@ const state = {
   deviceSelect: null,
   deviceWaterChart: [],
   deviceItemTableColumns: ['Name', 'ID', 'Container capacity', 'Perform water reset'],
-  deviceUpdateFields: ['device_id', 'label', 'water_container_capacity', 'water_reset']
+  deviceUpdateFieldsState: [
+    {
+      column: 'Device ID',
+      field: 'device_id',
+      type: 'String',
+      readOnly: true,
+      create: true,
+      initialValue: ''
+    },
+    {
+      column: 'Label',
+      field: 'label',
+      type: 'String',
+      readOnly: false,
+      create: true,
+      initialValue: ''
+    },
+    {
+      column: 'Water Level',
+      field: 'water_level',
+      type: 'number',
+      readOnly: true,
+      create: false,
+      initialValue: 100
+    },
+    {
+      column: 'Moisture Level',
+      field: 'moisture_level',
+      type: 'number',
+      readOnly: true,
+      create: false,
+      initialValue: 0
+    },
+    {
+      column: 'Water Total Capsity',
+      field: 'water_container_capacity',
+      type: 'number',
+      readOnly: false,
+      create: true,
+      initialValue: 2000
+    }
+  ]
 }
 
 const getters = {
@@ -14,9 +55,17 @@ const getters = {
   getDeviceById: (state) => (id) => {
     return state.devices.find((d) => d.device_id === id)
   },
-  getCurrentDevice: state => state.deviceSelect
+  getCurrentDevice: state => state.deviceSelect,
+  getDeviceUpdateFieldsState: state => state.deviceUpdateFieldsState
 }
 
+const tokenType = 'Bearer '
+const token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6Im5ld191c2VyOCIsImV4cCI6MTAxNjQ4Mzc5NDc4LCJlbWFpbCI6Im5ld191c2VyOEBtYWlsLmNvbSJ9.-IoQmhT1cFra9xznupuV9CllfVQ_cjpZm16jj35JFSE'
+const options = {
+  headers: {
+    Authorization: tokenType.concat(token)
+  }
+}
 const actions = {
   async initCurrentDevice ({ commit }) {
     console.log('beforeset')
@@ -29,22 +78,37 @@ const actions = {
   async fetchDevices ({ commit }) {
     console.log('beforeset')
     const response = await axios.get(
-      'http://127.0.0.1:8080/gadget_communicator_pull/api/list_devices')
-
+      'http://127.0.0.1:8080/gadget_communicator_pull/api/list_devices', options)
+      .catch(
+        function (error) {
+          console.log('Show error notification!')
+          return Promise.reject(error)
+        }
+      )
     console.log('beforeset')
     commit('setDevices', response.data)
   },
-  async addDevice ({ commit }, title) {
+  async addDevice ({ commit }, device) {
     const response = await axios.post(
-      'https://jsonplaceholder.typicode.com/devices',
-      { title, completed: false }
+      'http://127.0.0.1:8080/gadget_communicator_pull/api/create_device',
+      device, options
+    ).catch(
+      function (error) {
+        console.log('Show error notification!')
+        return Promise.reject(error)
+      }
     )
 
     commit('newDevice', response.data)
   },
   async deleteDevice ({ commit }, id) {
-    await axios.delete(`https://jsonplaceholder.typicode.com/devices/${id}`)
-
+    console.log('device_delete ' + id)
+    await axios.delete(`http://127.0.0.1:8080/gadget_communicator_pull/api/delete_device/${id}`, options).catch(
+      function (error) {
+        console.log('Show error notification!')
+        return Promise.reject(error)
+      }
+    )
     commit('removeDevice', id)
   },
   async filterDevices ({ commit }, e) {
@@ -63,18 +127,28 @@ const actions = {
     const deviceCopy = { ...updDevice }
     delete deviceCopy.water_level
     delete deviceCopy.moisture_level
-    deviceCopy.water_reset = true
-    const response = await axios.post(
+    await axios.post(
       'http://127.0.0.1:8080/gadget_communicator_pull/api/update_device',
-      deviceCopy
+      deviceCopy, options
+    ).catch(
+      function (error) {
+        console.log('Show error notification!')
+        return Promise.reject(error)
+      }
     )
-    commit('updateDevice', response.data)
+    commit('updateDevice', updDevice)
   },
   async fetchDeviceWaterCharts ({ commit }, id) {
     console.log('initCharts')
     console.log(id.value)
     const response = await axios.get(
-      `http://127.0.0.1:8080/gadget_communicator_pull/api/list_device_charts/${id}`)
+      `http://127.0.0.1:8080/gadget_communicator_pull/api/list_device_charts/${id}`, options)
+      .catch(
+        function (error) {
+          console.log('Show error notification!')
+          return Promise.reject(error)
+        }
+      )
 
     console.log(response.data)
 
@@ -104,10 +178,11 @@ const mutations = {
   },
   newDevice: (state, device) => state.devices.unshift(device),
   removeDevice: (state, id) =>
-    (state.devices = state.devices.filter(device => device.id !== id)),
+    (state.devices = state.devices.filter(device => device.device_id !== id)),
   updateDevice: (state, updDevice) => {
     const index = state.devices.findIndex(device => device.id === updDevice.id)
     if (index !== -1) {
+      state.devices.splice(index, 1, updDevice)
       console.log(updDevice)
     }
   }

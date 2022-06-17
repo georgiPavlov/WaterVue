@@ -1,28 +1,87 @@
 <script setup>
-import { ref } from 'vue'
-import { mdiMonitorCellphone, mdiAccountMultiple, mdiTableBorder, mdiTableOff } from '@mdi/js'
+import { ref, computed, watch } from 'vue'
+import { mdiAccountMultiple } from '@mdi/js'
 import MainSection from '@/components/MainSection.vue'
-import Notification from '@/components/Notification.vue'
 import ClientsTable from '@/components/ClientsTable.vue'
 import CardComponent from '@/components/CardComponent.vue'
 import TitleBar from '@/components/TitleBar.vue'
 import HeroBar from '@/components/HeroBar.vue'
-import BottomOtherPagesSection from '@/components/BottomOtherPagesSection.vue'
-import TitleSubBar from '@/components/TitleSubBar.vue'
+import JbButtons from '@/components/JbButtons.vue'
+import JbButton from '@/components/JbButton.vue'
+import Divider from '@/components/Divider.vue'
+import { useStore } from 'vuex'
+
+const store = useStore()
+
+// eslint-disable-next-line no-unused-vars
+const modalCreatePlanActive = computed(() => store.getters.getModalCreatePlanActive)
+
+const devices = computed(() => store.getters.allDevices)
+
+const devicesUpdateFields = computed(() => store.getters.getDeviceUpdateFieldsState)
+
+watch(() => devicesUpdateFields.value, () => {
+  console.log('devicesUpdateFields.value ' + devicesUpdateFields.value)
+})
 
 const titleStack = ref(['Admin', 'Tables'])
+
+const modalCreatePlanActiveT = (device) => {
+  JSON.stringify(devicesUpdateFields.value, null, '  ')
+  console.info('devicesUpdateFields.value ' + devicesUpdateFields.value[1].column)
+  store.dispatch('modalCreatePlanActiveToggle')
+}
+
+const modalDeletePlanActiveT = () => {
+  store.dispatch('modalDeletePlanActiveToggle')
+}
+
+const modalCreateDevice = (device) => {
+  console.log('modalCreateDevice ' + device.label)
+  JSON.stringify(device, null, '  ')
+  store.dispatch('addDevice', device)
+}
+
+const modalEditDevice = (device) => {
+  console.log('modalEditDevice2 ' + device)
+  JSON.stringify(device, null, '  ')
+  store.dispatch('updateDevice', device)
+}
+
+const modalDeleteDevice = (selection) => {
+  console.log('test delete')
+  store.dispatch('deleteDevice', selection)
+  console.log('test delete2')
+}
+
+const update = ref(true)
+
 </script>
 
 <template>
   <title-bar :title-stack="titleStack" />
-  <hero-bar>Tables</hero-bar>
+  <hero-bar>Devices</hero-bar>
   <main-section>
-    <notification
-      color="info"
-      :icon="mdiMonitorCellphone"
+    <jb-buttons
+      type="justify-start lg:justify-end"
+      no-wrap
     >
-      <b>Responsive table.</b> Collapses on mobile
-    </notification>
+      <jb-button
+        type="reset"
+        color="info"
+        outline
+        label="Create"
+        @click="modalCreatePlanActiveT"
+      />
+      <jb-button
+        type="reset"
+        color="danger"
+        outline
+        label="Delete"
+        @click="modalDeletePlanActiveT"
+      />
+    </jb-buttons>
+    <divider />
 
     <card-component
       class="mb-6"
@@ -30,42 +89,17 @@ const titleStack = ref(['Admin', 'Tables'])
       :icon="mdiAccountMultiple"
       has-table
     >
-      <clients-table checkable />
+      <clients-table
+        v-if="update"
+        checkable
+        :rows="devices"
+        :item-table-columns="devicesUpdateFields"
+        id-name="device_id"
+        @delete="modalDeleteDevice"
+        @create="modalCreateDevice"
+        @edit="modalEditDevice"
+      />
     </card-component>
-
-    <title-sub-bar
-      :icon="mdiTableBorder"
-      title="Wrapped variation"
-    />
-
-    <notification
-      color="success"
-      :icon="mdiTableBorder"
-    >
-      <b>Tightly wrapped</b> &mdash; table header becomes card header
-    </notification>
-
-    <card-component
-      class="mb-6"
-      has-table
-    >
-      <clients-table checkable />
-    </card-component>
-
-    <title-sub-bar
-      :icon="mdiTableOff"
-      title="Empty variation"
-    />
-
-    <notification
-      color="danger"
-      :icon="mdiTableOff"
-    >
-      <b>Empty table.</b> When there's nothing to show
-    </notification>
-
-    <card-component empty />
   </main-section>
 
-  <bottom-other-pages-section />
 </template>
