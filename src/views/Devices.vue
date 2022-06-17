@@ -10,8 +10,11 @@ import JbButtons from '@/components/JbButtons.vue'
 import JbButton from '@/components/JbButton.vue'
 import Divider from '@/components/Divider.vue'
 import { useStore } from 'vuex'
+import VueBasicAlert from 'vue-basic-alert'
 
 const store = useStore()
+
+const alert = ref(null)
 
 const devices = computed(() => store.getters.allDevices)
 
@@ -21,7 +24,7 @@ watch(() => devicesUpdateFields.value, () => {
   console.log('devicesUpdateFields.value ' + devicesUpdateFields.value)
 })
 
-const titleStack = ref(['Admin', 'Tables'])
+const titleStack = ref(['Tables'])
 
 const modalCreateElementActiveT = (device) => {
   JSON.stringify(devicesUpdateFields.value, null, '  ')
@@ -33,22 +36,39 @@ const modalDeleteElementActiveT = () => {
   store.dispatch('modalDeleteElementActiveToggle')
 }
 
-const modalCreateDevice = (device) => {
-  console.log('modalCreateDevice ' + device.label)
-  JSON.stringify(device, null, '  ')
-  store.dispatch('addDevice', device)
+const handleErrors = () => {
+  const errors = computed(() => store.getters.getErrors)
+  if (errors.value !== 'none') {
+    alert.value.showAlert(
+      'error',
+      errors.value
+    )
+    store.dispatch('modalCreateElementActiveToggleErrorsFalse')
+  }
 }
 
-const modalEditDevice = (device) => {
-  console.log('modalEditDevice2 ' + device)
+const modalCreateDevice = (device, errorsHandler) => {
   JSON.stringify(device, null, '  ')
-  store.dispatch('updateDevice', device)
+  store.dispatch('addDevice', device).then(() => {
+    handleErrors()
+    errorsHandler()
+  })
 }
 
-const modalDeleteDevice = (selection) => {
+const modalEditDevice = (device, errorsHandler) => {
+  JSON.stringify(device, null, '  ')
+  store.dispatch('updateDevice', device).then(() => {
+    handleErrors()
+    errorsHandler()
+  })
+}
+
+const modalDeleteDevice = (selection, errorsHandler) => {
   console.log('test delete')
-  store.dispatch('deleteDevice', selection)
-  console.log('test delete2')
+  store.dispatch('deleteDevice', selection).then(() => {
+    handleErrors()
+    errorsHandler()
+  })
 }
 
 const update = ref(true)
@@ -99,5 +119,9 @@ const update = ref(true)
       />
     </card-component>
   </main-section>
-
+  <vue-basic-alert
+    ref="alert"
+    :duration="500"
+    :close-in="2000"
+  />
 </template>

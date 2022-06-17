@@ -3,11 +3,28 @@ import axios from 'axios'
 import { darkModeKey, styleKey } from '@/config.js'
 import * as styles from '@/styles.js'
 import device from './modules/device'
+import plan from './modules/plan'
+import statusPlan from './modules/statusPlan'
+import photo from './modules/photo'
+import login from './modules/login'
+import register from './modules/register'
+import profile from './modules/profile'
+import forgottenPassword from './modules/forgottenPassword'
 import createPersistedState from 'vuex-persistedstate'
 
 export default new Vuex.Store({
+  errors: 'none',
+  isAuthenticated: false,
   plugins: [createPersistedState()],
   state: {
+    tokenType: 'Bearer ',
+    token: '',
+    baseURL: 'http://water-me-lb-842691727.eu-central-1.elb.amazonaws.com:8000',
+    options: {
+      headers: {
+        Authorization: 'none'
+      }
+    },
     /* Styles */
     lightBorderStyle: '',
     lightBgStyle: '',
@@ -52,9 +69,16 @@ export default new Vuex.Store({
     /* Tables create a element */
     isModalElementPlanActive: false,
 
+    isModalElementPlanActiveUpdate: false,
+
+    isModalElementPlanActiveErrors: false,
+
     isModalDeleteElementActive: false
   },
   mutations: {
+    setTokenM (state, token) {
+      state.token = token
+    },
     /* A fit-them-all commit */
     basic (state, payload) {
       state[payload.key] = payload.value
@@ -87,19 +111,53 @@ export default new Vuex.Store({
     /* Tables */
     modalCreateElementActiveToggleM (state) {
       state.isModalElementPlanActive = !state.isModalElementPlanActive
-      console.log('modalCreateElementActiveToggleM' + state.isModalElementPlanActive)
+    },
+
+    modalUpdateElementActiveToggleM (state) {
+      state.isModalElementPlanActiveUpdate = !state.isModalElementPlanActiveUpdate
+    },
+
+    modalCreateElementActiveToggleErrorsM (state) {
+      state.isModalElementPlanActiveErrors = !state.isModalElementPlanActiveErrors
+    },
+
+    modalCreateElementActiveToggleErrorsFalseM (state) {
+      state.isModalElementPlanActiveErrors = true
     },
 
     modalDeleteElementActiveToggleM (state) {
       state.isModalDeleteElementActive = !state.isModalDeleteElementActive
-      console.log('modalDeleteElementActiveToggleM' + state.isModalDeleteElementActive)
+    },
+    setErrors (state, error) {
+      state.errors = error
+    },
+    setIsAuthenticatedM (state, option) {
+      state.isAuthenticated = option
     }
   },
   getters: {
+    getAuthenticated: state => {
+      return state.isAuthenticated
+    },
+    getOptions: state => {
+      state.options.headers.Authorization = state.tokenType.concat(state.token)
+      return state.options
+    },
+    getBaseUrl: state => state.baseURL,
     getModalCreateElementActive: state => state.isModalElementPlanActive,
-    getModalDeleteElementActive: state => state.isModalDeleteElementActive
+    getModalUpdateElementActive: state => state.isModalElementPlanActiveUpdate,
+    getModalCreateElementActiveErrors: state => state.isModalElementPlanActiveErrors,
+    getModalDeleteElementActive: state => state.isModalDeleteElementActive,
+    getSelectedDevices: state => state.deviceSelect,
+    getErrors: state => state.errors
   },
   actions: {
+    setToken ({ commit }, token) {
+      commit('setTokenM', token)
+    },
+    cleanErrors ({ commit }) {
+      commit('setErrors', 'none')
+    },
     setStyle ({ commit, dispatch }, payload) {
       const style = styles[payload] ?? styles.basic
 
@@ -169,11 +227,40 @@ export default new Vuex.Store({
       commit('modalCreateElementActiveToggleM')
     },
 
+    modalUpdateElementActiveToggle ({ commit }) {
+      commit('modalUpdateElementActiveToggleM')
+    },
+
+    modalCreateElementActiveToggleErrors ({ commit }) {
+      commit('modalCreateElementActiveToggleErrorsM')
+    },
+    modalCreateElementActiveToggleErrorsFalse ({ commit }) {
+      commit('modalCreateElementActiveToggleErrorsFalseM')
+    },
+
     modalDeleteElementActiveToggle ({ commit }) {
       commit('modalDeleteElementActiveToggleM')
+    },
+    async setIsAuthenticated ({ dispatch, commit, getters, rootGetters }, code) {
+      console.log('code: ', code)
+      const isAuthenticated = rootGetters.getAuthenticated
+      if (code === 401) {
+        commit('setIsAuthenticatedM', false)
+      } else if (code === 400 && isAuthenticated === false) {
+        commit('setIsAuthenticatedM', false)
+      } else {
+        commit('setIsAuthenticatedM', true)
+      }
     }
   },
   modules: {
-    device
+    device,
+    plan,
+    statusPlan,
+    photo,
+    login,
+    register,
+    forgottenPassword,
+    profile
   }
 })

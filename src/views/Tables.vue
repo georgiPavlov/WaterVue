@@ -60,5 +60,4 @@ const modalDeletePlanActiveT = () => {
       <clients-table checkable />
     </card-component>
   </main-section>
-
 </template>

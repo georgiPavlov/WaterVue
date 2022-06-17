@@ -4,7 +4,6 @@ const state = {
   devices: [],
   deviceSelect: null,
   deviceWaterChart: [],
-  deviceItemTableColumns: ['Name', 'ID', 'Container capacity', 'Perform water reset'],
   deviceUpdateFieldsState: [
     {
       column: 'Device ID',
@@ -45,6 +44,14 @@ const state = {
       readOnly: false,
       create: true,
       initialValue: 2000
+    },
+    {
+      column: 'Send Email',
+      field: 'send_email',
+      type: 'String',
+      readOnly: false,
+      create: true,
+      initialValue: false
     }
   ]
 }
@@ -59,122 +66,149 @@ const getters = {
   getDeviceUpdateFieldsState: state => state.deviceUpdateFieldsState
 }
 
-const tokenType = 'Bearer '
-const token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6Im5ld191c2VyOSIsImV4cCI6MTAxNjU2NTI2NTQ2LCJlbWFpbCI6Im5ld191c2VyOEBtYWlsLmNvbSJ9.PzVPknqnwPh1yLjA2Xru8B1x-V2eiscrsKYQOtIi8VM'
-const options = {
-  headers: {
-    Authorization: tokenType.concat(token)
-  }
-}
 const actions = {
   async initCurrentDevice ({ commit }) {
-    console.log('beforeset')
     commit('mInitCurrentDeviceLabel')
   },
+  async setCurrentDevice ({ commit }, device) {
+    commit('mSetCurrentDevice', device)
+  },
+  async setCurrentDeviceToNull ({ commit }) {
+    commit('mSetCurrentDeviceToNull')
+  },
   async setDeviceLabel ({ commit }, device) {
-    console.log('dfdsf')
     commit('mSetDeviceSelect', device)
   },
-  async fetchDevices ({ commit }) {
-    console.log('beforeset')
+  async fetchDevices ({ dispatch, commit, getters, rootGetters }) {
+    dispatch('cleanErrors')
+    const baseURL = rootGetters.getBaseUrl
+    const options = rootGetters.getOptions
     const response = await axios.get(
-      'http://127.0.0.1:8080/gadget_communicator_pull/api/list_devices', options)
+      baseURL.concat('/gadget_communicator_pull/api/list_devices'), options)
       .catch(
         function (error) {
+          dispatch('setIsAuthenticated', error.response.status)
           console.log('Show error notification!')
           return Promise.reject(error)
         }
       )
-    console.log('beforeset')
+    dispatch('setIsAuthenticated', response.status)
+    // dispatch('fetchDevices')
     commit('setDevices', response.data)
   },
-  async addDevice ({ commit }, device) {
+  async addDevice ({ dispatch, commit, getters, rootGetters }, device) {
+    dispatch('cleanErrors')
+    const baseURL = rootGetters.getBaseUrl
+    const options = rootGetters.getOptions
     const response = await axios.post(
-      'http://127.0.0.1:8080/gadget_communicator_pull/api/create_device',
+      baseURL.concat('/gadget_communicator_pull/api/create_device'),
       device, options
     ).catch(
       function (error) {
+        dispatch('setIsAuthenticated', error.response.status)
         console.log('Show error notification!')
-        return Promise.reject(error)
+        commit('setErrors', error.response.data)
       }
     )
-
-    commit('newDevice', response.data)
+    if (typeof response !== 'undefined') {
+      commit('newDevice', response.data)
+    }
   },
-  async deleteDevice ({ commit }, id) {
-    console.log('device_delete ' + id)
-    await axios.delete(`http://127.0.0.1:8080/gadget_communicator_pull/api/delete_device/${id}`, options).catch(
+  async deleteDevice ({ dispatch, commit, getters, rootGetters }, id) {
+    dispatch('cleanErrors')
+    const baseURL = rootGetters.getBaseUrl
+    const options = rootGetters.getOptions
+    const url = baseURL.concat('/gadget_communicator_pull/api/delete_device/').concat(id)
+    await axios.delete(url, options).catch(
       function (error) {
+        dispatch('setIsAuthenticated', error.response.status)
         console.log('Show error notification!')
-        return Promise.reject(error)
+        commit('setErrors', error.response.data)
       }
     )
     commit('removeDevice', id)
   },
-  async filterDevices ({ commit }, e) {
-    // Get selected number
-    const limit = parseInt(
-      e.target.options[e.target.options.selectedIndex].innerText
-    )
-
-    const response = await axios.get(
-      `https://jsonplaceholder.typicode.com/devices?_limit=${limit}`
-    )
-
-    commit('setDevices', response.data)
-  },
-  async updateDevice ({ commit }, updDevice) {
+  async updateDevice ({ dispatch, commit, getters, rootGetters }, updDevice) {
+    dispatch('cleanErrors')
+    const baseURL = rootGetters.getBaseUrl
+    const options = rootGetters.getOptions
     const deviceCopy = { ...updDevice }
     delete deviceCopy.water_level
     delete deviceCopy.moisture_level
     await axios.post(
-      'http://127.0.0.1:8080/gadget_communicator_pull/api/update_device',
+      baseURL.concat('/gadget_communicator_pull/api/update_device'),
       deviceCopy, options
     ).catch(
       function (error) {
+        dispatch('setIsAuthenticated', error.response.status)
         console.log('Show error notification!')
-        return Promise.reject(error)
+        commit('setErrors', error.response.data)
       }
     )
     commit('updateDevice', updDevice)
   },
-  async fetchDeviceWaterCharts ({ commit }, id) {
-    console.log('initCharts')
-    console.log(id.value)
-    const response = await axios.get(
-      `http://127.0.0.1:8080/gadget_communicator_pull/api/list_device_charts/${id}`, options)
+  async fetchDeviceWaterCharts ({ dispatch, commit, getters, rootGetters }, id) {
+    dispatch('cleanErrors')
+    const baseURL = rootGetters.getBaseUrl
+    const options = rootGetters.getOptions
+    const url = baseURL.concat('/gadget_communicator_pull/api/list_device_charts/').concat(id)
+    const response = await axios.get(url, options)
       .catch(
         function (error) {
+          dispatch('setIsAuthenticated', error.response.status)
           console.log('Show error notification!')
           return Promise.reject(error)
         }
       )
-
-    console.log(response.data)
-
     commit('getDeviceWaterCharts', response.data)
+  },
+  async updateCurrentDevice ({ dispatch, commit, getters, rootGetters }) {
+    dispatch('cleanErrors')
+    const baseURL = rootGetters.getBaseUrl
+    const options = rootGetters.getOptions
+    const response = await axios.get(
+      baseURL.concat('/gadget_communicator_pull/api/list_devices'), options)
+      .catch(
+        function (error) {
+          dispatch('setIsAuthenticated', error.response.status)
+          console.log('Show error notification!')
+          return Promise.reject(error)
+        }
+      )
+    if (typeof response !== 'undefined') {
+      dispatch('setIsAuthenticated', response.status)
+      // dispatch('fetchDevices')
+      commit('setDevices', response.data)
+      commit('mUpdateCurrentDevice')
+    }
   }
 }
 
 const mutations = {
+  mUpdateCurrentDevice (state) {
+    const deviceSelect = state.deviceSelect.device_id
+    const d = state.devices.filter(device => device.device_id === deviceSelect)[0]
+    console.log(JSON.stringify(d))
+    state.deviceSelect = d
+  },
   mInitCurrentDeviceLabel (state) {
     if (state.deviceSelect === null) {
       (state.deviceSelect = state.devices.length !== 0 ? state.devices[0] : null)
-      console.log('changing current device')
     }
-    console.log('mInitCurrentDeviceLabel')
+  },
+  mSetCurrentDeviceToNull (state) {
+    console.log('select mSetCurrentDeviceToNull')
+    console.log(JSON.stringify(state.deviceSelect))
+    state.deviceSelect = null
   },
   mSetDeviceSelect (state, device) {
     (state.deviceSelect = device)
-    console.log('setDeviceSelect')
   },
   setDevices (state, devices) {
     (state.devices = devices)
-    console.log('afterset2')
   },
   getDeviceWaterCharts (state, deviceWaterChart) {
     (state.deviceWaterChart = deviceWaterChart)
-    console.log('chartset2')
   },
   newDevice: (state, device) => state.devices.unshift(device),
   removeDevice: (state, id) =>
@@ -183,7 +217,6 @@ const mutations = {
     const index = state.devices.findIndex(device => device.id === updDevice.id)
     if (index !== -1) {
       state.devices.splice(index, 1, updDevice)
-      console.log(updDevice)
     }
   }
 }
