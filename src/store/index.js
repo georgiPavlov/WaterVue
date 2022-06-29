@@ -47,7 +47,12 @@ export default new Vuex.Store({
 
     /* Sample data (commonly used) */
     clients: [],
-    history: []
+    history: [],
+
+    /* Tables create a element */
+    isModalElementPlanActive: false,
+
+    isModalDeleteElementActive: false
   },
   mutations: {
     /* A fit-them-all commit */
@@ -77,7 +82,22 @@ export default new Vuex.Store({
       if (payload.avatar) {
         state.userAvatar = payload.avatar
       }
+    },
+
+    /* Tables */
+    modalCreateElementActiveToggleM (state) {
+      state.isModalElementPlanActive = !state.isModalElementPlanActive
+      console.log('modalCreateElementActiveToggleM' + state.isModalElementPlanActive)
+    },
+
+    modalDeleteElementActiveToggleM (state) {
+      state.isModalDeleteElementActive = !state.isModalDeleteElementActive
+      console.log('modalDeleteElementActiveToggleM' + state.isModalDeleteElementActive)
     }
+  },
+  getters: {
+    getModalCreateElementActive: state => state.isModalElementPlanActive,
+    getModalDeleteElementActive: state => state.isModalDeleteElementActive
   },
   actions: {
     setStyle ({ commit, dispatch }, payload) {
@@ -143,6 +163,14 @@ export default new Vuex.Store({
         .catch(error => {
           alert(error.message)
         })
+    },
+
+    modalCreateElementActiveToggle ({ commit }) {
+      commit('modalCreateElementActiveToggleM')
+    },
+
+    modalDeleteElementActiveToggle ({ commit }) {
+      commit('modalDeleteElementActiveToggleM')
     }
   },
   modules: {
