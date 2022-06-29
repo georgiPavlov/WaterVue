@@ -6,8 +6,15 @@ import JbButtons from '@/components/JbButtons.vue'
 import CardComponent from '@/components/CardComponent.vue'
 import Divider from '@/components/Divider.vue'
 import Overlay from '@/components/Overlay.vue'
+import { useStore } from 'vuex'
+
+const store = useStore()
 
 const props = defineProps({
+  isModelFromState: {
+    type: String,
+    default: null
+  },
   title: {
     type: String,
     default: null
@@ -39,7 +46,11 @@ const value = computed({
 })
 
 const confirmCancel = mode => {
-  value.value = false
+  if (props.isModelFromState === null) {
+    value.value = false
+  } else {
+    store.dispatch(props.isModelFromState)
+  }
   emit(mode)
 }
 

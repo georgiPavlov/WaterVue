@@ -1,5 +1,5 @@
 <script setup>
-import { computed, watch, ref, toRef } from 'vue'
+import { computed, onBeforeMount, reactive, ref, toRaw, toRef, watch } from 'vue'
 import { useStore } from 'vuex'
 import { mdiEye, mdiTrashCan } from '@mdi/js'
 import ModalBox from '@/components/ModalBox.vue'
@@ -7,29 +7,18 @@ import CheckboxCell from '@/components/CheckboxCell.vue'
 import Level from '@/components/Level.vue'
 import JbButtons from '@/components/JbButtons.vue'
 import JbButton from '@/components/JbButton.vue'
+import Field from '@/components/Field.vue'
+import Divider from '@/components/Divider.vue'
+import Control from '@/components/Control.vue'
 
 const props = defineProps({
   checkable: Boolean,
+  idName: {
+    default: 'device_id'
+  },
   itemTableColumns: {
     type: Array,
-    default: () => [
-      {
-        column: 'purple',
-        field: 'minivan'
-      },
-      {
-        column: 'green',
-        field: 'car'
-      },
-      {
-        column: 'green1',
-        field: 'carq'
-      },
-      {
-        column: 'green1',
-        field: 'car1'
-      }
-    ]
+    default: () => []
   },
   updateFields: {
     type: Array,
@@ -37,40 +26,10 @@ const props = defineProps({
   },
   rows: {
     type: Array,
-    required: true,
-    default: () => [{
-      device_id: '77',
-      label: 'gogi2',
-      water_level: 1000,
-      moisture_level: 0,
-      water_container_capacity: 2000,
-      water_reset: false
-    },
-    {
-      device_id: '888',
-      label: 'gogi',
-      water_level: 70,
-      moisture_level: 0,
-      water_container_capacity: 2000,
-      water_reset: true
-    },
-    {
-      device_id: '888',
-      label: 'gogi',
-      water_level: 70,
-      moisture_level: 0,
-      water_container_capacity: 2000,
-      water_reset: true
-    },
-    {
-      device_id: '888',
-      label: 'gogi',
-      water_level: 70,
-      moisture_level: 0,
-      water_container_capacity: 2000,
-      water_reset: true
-    }
-    ]
+    default: () => []
+  },
+  typeElement: {
+    default: 'element'
   }
 })
 
@@ -98,15 +57,8 @@ const currentPage = ref(0)
 
 const checkedRows = ref([])
 
-const barcodePulse = toRef(props, 'rows')
-
-watch(() => barcodePulse.value, () => {
-  console.log(barcodePulse.value)
-  console.log('in rows')
-})
-
 const itemsPaginated = computed(
-  () => barcodePulse.value.slice(perPage.value * currentPage.value, perPage.value * (currentPage.value + 1))
+  () => rows.value.slice(perPage.value * currentPage.value, perPage.value * (currentPage.value + 1))
 )
 
 const numPages = computed(() => Math.ceil(items.value.length / perPage.value))
@@ -135,33 +87,201 @@ const remove = (arr, cb) => {
   return newArr
 }
 
-const checked = (isChecked, client) => {
-  if (isChecked) {
-    checkedRows.value.push(client)
+const checkedRowsBools = ref([])
+
+const checked = (isChecked, selection) => {
+  if (isChecked.value) {
+    checkedRowsBools.value.push(isChecked)
+    checkedRows.value.push(selection)
   } else {
-    checkedRows.value = remove(checkedRows.value, row => row.id === client.id)
+    console.log('remove')
+    checkedRows.value = remove(checkedRows.value, row => row[props.idName] === selection[props.idName])
   }
 }
+
+// device logic
+const rows = toRef(props, 'rows')
+
+watch(() => rows.value, () => {
+  console.log(rows.value)
+  console.log('in rows')
+})
+
+const getValueByKey = (keyName, row) => {
+  if (!row) {
+    return 'none'
+  }
+  return row[keyName]
+}
+
+const emit = defineEmits(['delete', 'edit', 'create'])
+
+const confirmClick = mode => {
+  emit(mode, selection.value)
+}
+
+const confirmClickCreate = mode => {
+  console.log('in confirmClickCreate')
+  const copy = toRaw(createObj)
+  console.log('copy' + copy.label)
+  emit(mode, copy)
+}
+
+const confirmClickUpdate = mode => {
+  console.log('in confirmClickCreate')
+  const copy = toRaw(selectionObj)
+  emit(mode, copy)
+}
+
+const confirmClickBulk = mode => {
+  // eslint-disable-next-line no-unused-vars
+  const arr = [...checkedRows.value]
+  arr.forEach(item => {
+    emit(mode, item[props.idName])
+    checked(false, item)
+  })
+  checkedRowsBools.value.forEach(item => {
+    item.value = false
+  })
+}
+
+const clickEmitDelete = () => confirmClick('delete')
+const clickEmitBulkDelete = () => confirmClickBulk('delete')
+const clickEmitEdit = () => confirmClickUpdate('edit')
+const clickEmitCreate = () => confirmClickCreate('create')
+
+const selection = ref()
+const selectionObj = reactive({})
+const createObj = reactive({})
+
+const sendEmitDelete = (row) => {
+  isModalDangerActive.value = true
+  selection.value = getValueByKey(props.idName, row)
+}
+
+const sendEmitEdit = (row) => {
+  isModalActive.value = true
+  selection.value = getValueByKey(props.idName, row)
+  convertToReactive(row)
+}
+
+const convertToReactive = (row) => {
+  for (const propertyName in row) {
+    selectionObj[propertyName] = row[propertyName]
+  }
+}
+
+const initSelectionObj = () => {
+  for (const propertyName in props.itemTableColumns) {
+    const field = props.itemTableColumns[propertyName].field
+    selectionObj[field] = ''
+  }
+}
+
+const initCreateObj = () => {
+  for (const propertyName in props.itemTableColumns) {
+    const field = props.itemTableColumns[propertyName].field
+    const initialValue = props.itemTableColumns[propertyName].initialValue
+    console.log('init ' + initialValue)
+    console.log('init2 ' + props.itemTableColumns[propertyName].initialValue)
+    if (initialValue !== undefined) {
+      console.log('in undefined check')
+      createObj[field] = initialValue
+    } else {
+      createObj[field] = ''
+    }
+  }
+}
+
+const filteredEvents = () => {
+  return props.itemTableColumns.filter(element => {
+    return element.create === true
+  })
+}
+
+onBeforeMount(() => {
+  initSelectionObj()
+  initCreateObj()
+})
+
+const modalCreateElementActive = computed(() => store.getters.getModalCreateElementActive)
+
+const modalDeleteElementActive = computed(() => store.getters.getModalDeleteElementActive)
+
+const createElement = computed(() => ['Create', ' ', props.typeElement].join(''))
+
+const editElement = computed(() => ['Edit', ' ', props.typeElement].join(''))
+
+const DeleteElement = computed(() => ['Delete', ' ', props.typeElement].join(''))
+
 </script>
 
 <template>
   <modal-box
     v-model="isModalActive"
-    title="Sample modal"
+    :large-title="editElement"
+    button="success"
+    button-label="Save"
+    @confirm="clickEmitEdit"
   >
-    <p>Lorem ipsum dolor sit amet <b>adipiscing elit</b></p>
-    <p>This is sample modal</p>
+    <field
+      v-for="(item, index) in itemTableColumns"
+      :key="index"
+      :label="item.column"
+    >
+      <control
+        v-model="selectionObj[item.field]"
+        :type="item.type"
+        :read-only="!!item.readOnly"
+      />
+    </field>
+
+    <divider />
+  </modal-box>
+
+  <modal-box
+    v-model="modalCreateElementActive"
+    :large-title="createElement"
+    button="success"
+    has-cancel
+    button-label="Save"
+    is-model-from-state="modalCreateElementActiveToggle"
+    @confirm="clickEmitCreate"
+  >
+    <field
+      v-for="(item, index) in filteredEvents()"
+      :key="index"
+      :label="item.column"
+    >
+      <control
+        v-model="createObj[item.field]"
+        :type="item.type"
+      />
+    </field>
+
+    <divider />
+  </modal-box>
+
+  <modal-box
+    v-model="modalDeleteElementActive"
+    :large-title="DeleteElement"
+    button="success"
+    has-cancel
+    button-label="Save"
+    is-model-from-state="modalDeleteElementActiveToggle"
+    @confirm="clickEmitBulkDelete"
+  >
+    <divider />
   </modal-box>
 
   <modal-box
     v-model="isModalDangerActive"
-    large-title="Please confirm"
+    large-title="Do you want to confirm deletion"
     button="danger"
     has-cancel
-  >
-    <p>Lorem ipsum dolor sit amet <b>adipiscing elit</b></p>
-    <p>This is sample modal</p>
-  </modal-box>
+    button-label="Delete"
+    @confirm="clickEmitDelete"
+  />
 
   <div
     v-if="checkedRows.length"
@@ -170,7 +290,7 @@ const checked = (isChecked, client) => {
   >
     <span
       v-for="checkedRow in checkedRows"
-      :key="checkedRow.id"
+      :key="checkedRow[idName]"
       class="inline-block px-2 py-1 rounded-sm mr-2 text-sm dark:bg-gray-700"
       :class="lightBgStyle"
     >
@@ -200,20 +320,15 @@ const checked = (isChecked, client) => {
       >
         <checkbox-cell
           v-if="checkable"
-          @checked="checked($event, client)"
+          @checked="checked($event, row)"
         />
-        <td class="image-cell">
-          <user-avatar
-            username="client.name"
-            class="image"
-          />
-        </td>
+        <td class="image-cell" />
         <td
           v-for="(item, i) in itemTableColumns"
           :key="i"
           :data-label="item.column"
         >
-          test
+          {{ getValueByKey(item.field, row) }}
         </td>
         <td class="actions-cell">
           <jb-buttons
@@ -224,13 +339,13 @@ const checked = (isChecked, client) => {
               color="info"
               :icon="mdiEye"
               small
-              @click="isModalActive = true"
+              @click="sendEmitEdit(row)"
             />
             <jb-button
               color="danger"
               :icon="mdiTrashCan"
               small
-              @click="isModalDangerActive = true"
+              @click="sendEmitDelete(row)"
             />
           </jb-buttons>
         </td>

@@ -13,7 +13,9 @@ const emit = defineEmits(['checked'])
 const checked = ref(false)
 
 watch(checked, newVal => {
-  emit('checked', newVal)
+  console.log('check' + checked.value)
+  console.log('check2' + newVal)
+  emit('checked', checked)
 })
 </script>
 

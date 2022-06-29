@@ -61,6 +61,7 @@ const store = useStore()
 
 const updateSelectedDevice = () => {
   const selectedDevice = computed(() => store.getters.getCurrentDevice)
+  selectedDevice.value.water_reset = true
   store.dispatch('updateDevice', selectedDevice.value)
   store.dispatch('fetchDevices')
   const selection = computed(() => store.getters.getDeviceById(selectedDevice.value.device_id))
