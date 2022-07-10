@@ -61,6 +61,7 @@ const getters = {
 
 const tokenType = 'Bearer '
 const token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6Im5ld191c2VyOSIsImV4cCI6MTAxNjU2NTI2NTQ2LCJlbWFpbCI6Im5ld191c2VyOEBtYWlsLmNvbSJ9.PzVPknqnwPh1yLjA2Xru8B1x-V2eiscrsKYQOtIi8VM'
+const baseURL = 'http://127.0.0.1:8080'
 const options = {
   headers: {
     Authorization: tokenType.concat(token)
@@ -78,7 +79,7 @@ const actions = {
   async fetchDevices ({ commit }) {
     console.log('beforeset')
     const response = await axios.get(
-      'http://127.0.0.1:8080/gadget_communicator_pull/api/list_devices', options)
+      baseURL.concat('/gadget_communicator_pull/api/list_devices'), options)
       .catch(
         function (error) {
           console.log('Show error notification!')
@@ -90,7 +91,7 @@ const actions = {
   },
   async addDevice ({ commit }, device) {
     const response = await axios.post(
-      'http://127.0.0.1:8080/gadget_communicator_pull/api/create_device',
+      baseURL.concat('/gadget_communicator_pull/api/create_device'),
       device, options
     ).catch(
       function (error) {
@@ -103,7 +104,8 @@ const actions = {
   },
   async deleteDevice ({ commit }, id) {
     console.log('device_delete ' + id)
-    await axios.delete(`http://127.0.0.1:8080/gadget_communicator_pull/api/delete_device/${id}`, options).catch(
+    const url = baseURL.concat('/gadget_communicator_pull/api/delete_device/').concat(id)
+    await axios.delete(url, options).catch(
       function (error) {
         console.log('Show error notification!')
         return Promise.reject(error)
@@ -128,7 +130,7 @@ const actions = {
     delete deviceCopy.water_level
     delete deviceCopy.moisture_level
     await axios.post(
-      'http://127.0.0.1:8080/gadget_communicator_pull/api/update_device',
+      baseURL.concat('/gadget_communicator_pull/api/update_device'),
       deviceCopy, options
     ).catch(
       function (error) {
@@ -141,8 +143,8 @@ const actions = {
   async fetchDeviceWaterCharts ({ commit }, id) {
     console.log('initCharts')
     console.log(id.value)
-    const response = await axios.get(
-      `http://127.0.0.1:8080/gadget_communicator_pull/api/list_device_charts/${id}`, options)
+    const url = baseURL.concat('/gadget_communicator_pull/api/list_device_charts/').concat(id)
+    const response = await axios.get(url, options)
       .catch(
         function (error) {
           console.log('Show error notification!')
