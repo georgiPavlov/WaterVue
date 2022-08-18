@@ -17,6 +17,7 @@ store.commit('user', {
 
 onBeforeMount(() => {
   store.dispatch('fetchDevices')
+  store.dispatch('fetchPlans')
   store.dispatch('initCurrentDevice')
 })
 

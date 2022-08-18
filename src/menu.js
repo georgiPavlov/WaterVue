@@ -35,6 +35,11 @@ export default [
       icon: mdiTable
     },
     {
+      to: '/plans',
+      label: 'Plans',
+      icon: mdiTable
+    },
+    {
       to: '/forms',
       label: 'Forms',
       icon: mdiSquareEditOutline
