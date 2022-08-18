@@ -26,6 +26,8 @@ const emit = defineEmits(['update:modelValue'])
 const computedValue = computed({
   get: () => props.modelValue,
   set: value => {
+    console.log('radio')
+    console.log(value)
     emit('update:modelValue', value)
   }
 })

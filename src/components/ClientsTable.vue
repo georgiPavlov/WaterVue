@@ -16,6 +16,14 @@ const props = defineProps({
   idName: {
     default: 'device_id'
   },
+  buttonSettingsModel: {
+    type: Boolean,
+    default: false
+  },
+  showItemsAlways: {
+    type: Boolean,
+    default: true
+  },
   itemTableColumns: {
     type: Array,
     default: () => []
@@ -49,6 +57,8 @@ const items = computed(() => store.state.clients)
 
 const isModalActive = ref(false)
 
+const isModalActiveItems = ref(false)
+
 const isModalDangerActive = ref(false)
 
 const perPage = ref(10)
@@ -56,6 +66,8 @@ const perPage = ref(10)
 const currentPage = ref(0)
 
 const checkedRows = ref([])
+
+const weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 
 const itemsPaginated = computed(
   () => rows.value.slice(perPage.value * currentPage.value, perPage.value * (currentPage.value + 1))
@@ -104,7 +116,6 @@ const rows = toRef(props, 'rows')
 
 watch(() => rows.value, () => {
   console.log(rows.value)
-  console.log('in rows')
 })
 
 const getValueByKey = (keyName, row) => {
@@ -114,21 +125,22 @@ const getValueByKey = (keyName, row) => {
   return row[keyName]
 }
 
-const emit = defineEmits(['delete', 'edit', 'create'])
+const emit = defineEmits(['delete', 'edit', 'create', 'delete_item', 'create_item'])
 
 const confirmClick = mode => {
   emit(mode, selection.value)
 }
 
+const confirmClickItem = (mode, index) => {
+  emit(mode, selectionObj, index)
+}
+
 const confirmClickCreate = mode => {
-  console.log('in confirmClickCreate')
   const copy = toRaw(createObj)
-  console.log('copy' + copy.label)
   emit(mode, copy)
 }
 
 const confirmClickUpdate = mode => {
-  console.log('in confirmClickCreate')
   const copy = toRaw(selectionObj)
   emit(mode, copy)
 }
@@ -148,11 +160,32 @@ const confirmClickBulk = mode => {
 const clickEmitDelete = () => confirmClick('delete')
 const clickEmitBulkDelete = () => confirmClickBulk('delete')
 const clickEmitEdit = () => confirmClickUpdate('edit')
+const clickCancelElement = () => returnSelectionToOriginalValue()
 const clickEmitCreate = () => confirmClickCreate('create')
+
+const clickEmitDeleteItem = (index) => confirmClickItem('delete_item', index)
+const clickEmitCreateItem = () => confirmClickItem('create_item')
 
 const selection = ref()
 const selectionObj = reactive({})
+const selectionObjTemp = {}
 const createObj = reactive({})
+
+const returnSelectionToOriginalValue = () => {
+  for (const propertyName in props.itemTableColumns) {
+    const field = props.itemTableColumns[propertyName].field
+    selectionObj[field] = selectionObjTemp[field]
+    setRowByCurrentSelection(field)
+  }
+}
+
+const setRowByCurrentSelection = (field) => {
+  for (const r in rows.value) {
+    if (rows.value[r][props.idName] === selection.value) {
+      rows.value[r][field] = selectionObj[field]
+    }
+  }
+}
 
 const sendEmitDelete = (row) => {
   isModalDangerActive.value = true
@@ -165,9 +198,21 @@ const sendEmitEdit = (row) => {
   convertToReactive(row)
 }
 
+const sendEmitViewItems = (row) => {
+  isModalActiveItems.value = true
+  selection.value = getValueByKey(props.idName, row)
+  convertToReactive(row)
+}
+
 const convertToReactive = (row) => {
+  const copy = toRaw(row)
   for (const propertyName in row) {
     selectionObj[propertyName] = row[propertyName]
+    if (copy[propertyName] instanceof Array) {
+      selectionObjTemp[propertyName] = [...copy[propertyName]]
+      continue
+    }
+    selectionObjTemp[propertyName] = copy[propertyName]
   }
 }
 
@@ -175,6 +220,7 @@ const initSelectionObj = () => {
   for (const propertyName in props.itemTableColumns) {
     const field = props.itemTableColumns[propertyName].field
     selectionObj[field] = ''
+    selectionObjTemp[field] = ''
   }
 }
 
@@ -182,10 +228,7 @@ const initCreateObj = () => {
   for (const propertyName in props.itemTableColumns) {
     const field = props.itemTableColumns[propertyName].field
     const initialValue = props.itemTableColumns[propertyName].initialValue
-    console.log('init ' + initialValue)
-    console.log('init2 ' + props.itemTableColumns[propertyName].initialValue)
     if (initialValue !== undefined) {
-      console.log('in undefined check')
       createObj[field] = initialValue
     } else {
       createObj[field] = ''
@@ -214,6 +257,25 @@ const editElement = computed(() => ['Edit', ' ', props.typeElement].join(''))
 
 const DeleteElement = computed(() => ['Delete', ' ', props.typeElement].join(''))
 
+const itemsElement = computed(() => ['', ' ', props.itemsBox].join(''))
+
+const buttonSettingsModelComputed = computed(() => {
+  return store.getters.buttonSettingsModel || props.showItemsAlways
+})
+
+// const showElements = () => {
+//   console.log('value' + buttonSettingsModelComputed.value)
+//   if (buttonSettingsModelComputed.value || props.showItemsAlways) {
+//     console.log('value' + buttonSettingsModelComputed.value + ' true')
+//     return true
+//   }
+//   console.log('value' + buttonSettingsModelComputed.value + ' false')
+//   return false
+// }
+
+const showXButton = (item) => {
+  return selectionObj[item.field].length
+}
 </script>
 
 <template>
@@ -223,6 +285,7 @@ const DeleteElement = computed(() => ['Delete', ' ', props.typeElement].join('')
     button="success"
     button-label="Save"
     @confirm="clickEmitEdit"
+    @cancel="clickCancelElement"
   >
     <field
       v-for="(item, index) in itemTableColumns"
@@ -230,15 +293,99 @@ const DeleteElement = computed(() => ['Delete', ' ', props.typeElement].join('')
       :label="item.column"
     >
       <control
+        v-if="item.type !== 'Array'"
         v-model="selectionObj[item.field]"
         :type="item.type"
         :read-only="!!item.readOnly"
       />
+
+      <div
+        v-if="item.type === 'Array'"
+        class="relative"
+      >
+        <field
+          v-for="(i, indexArr) in selectionObj[item.field]"
+          :key="indexArr"
+        >
+          <div class="grid gap-6 lg:grid-cols-3 lg:h-100 mb-6">
+            <div
+              v-for="(arrItem, indexItem) in i"
+              :key="indexItem"
+            >
+              <control
+                v-if="item.arr[indexItem] === 'select'"
+                v-model="i[indexItem]"
+                type="select"
+                :read-only="!!item.readOnly"
+                :model-value="i[indexItem]"
+                :options="weekdays"
+              />
+              <control
+                v-if="item.arr[indexItem] !== 'select'"
+                v-model="i[indexItem]"
+                type="time"
+                :read-only="!!item.readOnly"
+              />
+            </div>
+            <div
+              v-if="showXButton(item)"
+            >
+              <jb-buttons>
+                <jb-button
+                  v-if="selectionObj[item.field].length"
+                  label="X"
+                  color="danger"
+                  @click="clickEmitDeleteItem(indexArr)"
+                />
+              </jb-buttons>
+            </div>
+          </div>
+        </field>
+        <jb-buttons>
+          <jb-button
+            label="+"
+            color="info"
+            @click="clickEmitCreateItem"
+          />
+        </jb-buttons>
+      </div>
     </field>
 
     <divider />
   </modal-box>
+  <modal-box
+    v-model="isModalActiveItems"
+    :large-title="itemsElement"
+  >
+    <field
+      v-for="(item, index) in itemTableColumns"
+      :key="index"
+    >
+      <div
+        v-if="item.type === 'Array'"
+        class="relative"
+      >
+        <field
+          v-for="(i, indexArr) in selectionObj[item.field]"
+          :key="indexArr"
+        >
+          <div class="grid gap-6 lg:grid-cols-3 lg:h-100 mb-6">
+            <div
+              v-for="(arrItem, indexItem) in i"
+              :key="indexItem"
+            >
+              <control
+                v-model="i[indexItem]"
+                :read-only="true"
+              />
+            </div>
+          </div>
+        </field>
+      </div>
+    </field>
 
+    <divider />
+  </modal-box>
   <modal-box
     v-model="modalCreateElementActive"
     :large-title="createElement"
@@ -261,7 +408,6 @@ const DeleteElement = computed(() => ['Delete', ' ', props.typeElement].join('')
 
     <divider />
   </modal-box>
-
   <modal-box
     v-model="modalDeleteElementActive"
     :large-title="DeleteElement"
@@ -273,7 +419,6 @@ const DeleteElement = computed(() => ['Delete', ' ', props.typeElement].join('')
   >
     <divider />
   </modal-box>
-
   <modal-box
     v-model="isModalDangerActive"
     large-title="Do you want to confirm deletion"
@@ -297,61 +442,77 @@ const DeleteElement = computed(() => ['Delete', ' ', props.typeElement].join('')
       {{ checkedRow.name }}
     </span>
   </div>
-
-  <table>
-    <thead>
-      <tr>
-        <th v-if="checkable" />
-        <th />
-        <th
-          v-for="(item, index) in itemTableColumns"
-          :key="index"
-        >
-          {{ item.column }}
-        </th>
-        <th />
-      </tr>
-    </thead>
-    <tbody>
-      <tr
-        v-for="(row, index) in itemsPaginated"
-        :key="index"
-        :class="[tableTrStyle, index % 2 === 0 ? tableTrOddStyle : '']"
-      >
-        <checkbox-cell
-          v-if="checkable"
-          @checked="checked($event, row)"
-        />
-        <td class="image-cell" />
-        <td
-          v-for="(item, i) in itemTableColumns"
-          :key="i"
-          :data-label="item.column"
-        >
-          {{ getValueByKey(item.field, row) }}
-        </td>
-        <td class="actions-cell">
-          <jb-buttons
-            type="justify-start lg:justify-end"
-            no-wrap
+  <div
+    v-if="buttonSettingsModelComputed"
+  >
+    <table>
+      <thead>
+        <tr>
+          <th v-if="checkable" />
+          <th />
+          <th
+            v-for="(item, index) in itemTableColumns"
+            :key="index"
           >
-            <jb-button
-              color="info"
-              :icon="mdiEye"
-              small
-              @click="sendEmitEdit(row)"
-            />
-            <jb-button
-              color="danger"
-              :icon="mdiTrashCan"
-              small
-              @click="sendEmitDelete(row)"
-            />
-          </jb-buttons>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+            {{ item.column }}
+          </th>
+          <th />
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          v-for="(row, index) in itemsPaginated"
+          :key="index"
+          :class="[tableTrStyle, index % 2 === 0 ? tableTrOddStyle : '']"
+        >
+          <checkbox-cell
+            v-if="checkable"
+            @checked="checked($event, row)"
+          />
+          <td class="image-cell" />
+          <td
+            v-for="(item, i) in itemTableColumns"
+            :key="i"
+            :data-label="item.column"
+          >
+            <div v-if="item.type !== 'Array'">
+              {{ getValueByKey(item.field, row) }}
+            </div>
+            <div
+              v-else
+              class="place-items-center"
+            >
+              <jb-button
+                color="info"
+                :icon="mdiEye"
+                small
+                @click="sendEmitViewItems(row)"
+              />
+            </div>
+          </td>
+          <td class="actions-cell">
+            <jb-buttons
+              type="justify-start lg:justify-end"
+              no-wrap
+            >
+              <jb-button
+                color="info"
+                :icon="mdiEye"
+                small
+                @click="sendEmitEdit(row)"
+              />
+              <jb-button
+                color="danger"
+                :icon="mdiTrashCan"
+                small
+                @click="sendEmitDelete(row)"
+              />
+            </jb-buttons>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
   <div
     :class="lightBorderStyle"
     class="p-3 lg:px-6 border-t dark:border-gray-800"

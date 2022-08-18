@@ -4,7 +4,6 @@ const state = {
   devices: [],
   deviceSelect: null,
   deviceWaterChart: [],
-  deviceItemTableColumns: ['Name', 'ID', 'Container capacity', 'Perform water reset'],
   deviceUpdateFieldsState: [
     {
       column: 'Device ID',

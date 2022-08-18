@@ -46,7 +46,10 @@ const props = defineProps({
 const emit = defineEmits(['update:modelValue', 'right-icon-click'])
 
 const computedValue = computed({
-  get: () => props.modelValue,
+  get: () => {
+    console.log('props' + props.modelValue)
+    return props.modelValue
+  },
   set: value => {
     emit('update:modelValue', value)
   }
