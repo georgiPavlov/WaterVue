@@ -12,8 +12,11 @@ import Divider from '@/components/Divider.vue'
 import Field from '@/components/Field.vue'
 import CheckRadioPicker from '@/components/CheckRadioPicker.vue'
 import { useStore } from 'vuex'
+import VueBasicAlert from 'vue-basic-alert'
 
 const store = useStore()
+
+const alert = ref(null)
 
 const plans = computed(() => store.getters.getPlansByType(type.value[0]))
 
@@ -34,6 +37,14 @@ const modalDeleteElementActiveT = () => {
 const modalCreatePlan = (plan) => {
   console.log('modalCreatePlan ' + plan.name)
   JSON.stringify(plan, null, '  ')
+  // eslint-disable-next-line no-constant-condition
+  if (false) {
+    alert.value.showAlert(
+      'error',
+      'modalCreatePlan'
+    )
+    store.dispatch('modalCreateElementActiveToggleErrors')
+  }
   store.dispatch('addPlan', plan)
 }
 
@@ -68,24 +79,13 @@ const update = ref(true)
 
 const buttonSettingsModel = ref([])
 
-// eslint-disable-next-line no-unused-vars
-const buttonsBasic = computed(() => buttonSettingsModel.value.indexOf('basic') > -1)
-
-// eslint-disable-next-line no-unused-vars
-const buttonsTime = computed(() => buttonSettingsModel.value.indexOf('time') > -1)
-
-// eslint-disable-next-line no-unused-vars
-const buttonsMoisture = computed(() => buttonSettingsModel.value.indexOf('moisture') > -1)
-
-// eslint-disable-next-line no-unused-vars
-const selectedDevice = computed(() => store.getters.getCurrentDevice)
-
 const type = ref([0])
 
 const setAllButOneToFalse = (modelValue) => {
+  console.log('setAllButOneToFalse' + modelValue)
   let enable = false
   if (modelValue.length > 1) {
-    buttonSettingsModel.value.splice(buttonSettingsModel.value.indexOf(modelValue[0]), 1)
+    modelValue.splice(modelValue.indexOf(modelValue[0]), 1)
   }
   console.log('modelValue basic')
   if (modelValue[0] === 'basic') {
@@ -184,12 +184,21 @@ const show = false
         id-name="name"
         type-element="plan"
         :show-items-always="show"
+        :show-radio-buttons1="true"
+        :limit="true"
+        :limit-number="100"
         @delete="modalDeletePlan"
         @create="modalCreatePlan"
         @edit="modalEditPlan"
         @create_item="modalCreateTimeItem"
         @delete_item="modalDeleteTimeItem"
+        @radio_elements="setAllButOneToFalse"
       />
     </card-component>
   </main-section>
+  <vue-basic-alert
+    ref="alert"
+    :duration="500"
+    :close-in="2000"
+  />
 </template>

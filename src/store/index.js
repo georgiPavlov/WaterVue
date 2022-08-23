@@ -53,6 +53,8 @@ export default new Vuex.Store({
     /* Tables create a element */
     isModalElementPlanActive: false,
 
+    isModalElementPlanActiveErrors: false,
+
     isModalDeleteElementActive: false
   },
   mutations: {
@@ -91,6 +93,11 @@ export default new Vuex.Store({
       console.log('modalCreateElementActiveToggleM' + state.isModalElementPlanActive)
     },
 
+    modalCreateElementActiveToggleErrorsM (state) {
+      state.isModalElementPlanActiveErrors = !state.isModalElementPlanActiveErrors
+      console.log('isModalElementPlanActiveErrors' + state.isModalElementPlanActiveErrors)
+    },
+
     modalDeleteElementActiveToggleM (state) {
       state.isModalDeleteElementActive = !state.isModalDeleteElementActive
       console.log('modalDeleteElementActiveToggleM' + state.isModalDeleteElementActive)
@@ -98,6 +105,7 @@ export default new Vuex.Store({
   },
   getters: {
     getModalCreateElementActive: state => state.isModalElementPlanActive,
+    getModalCreateElementActiveErrors: state => state.isModalElementPlanActiveErrors,
     getModalDeleteElementActive: state => state.isModalDeleteElementActive
   },
   actions: {
@@ -168,6 +176,10 @@ export default new Vuex.Store({
 
     modalCreateElementActiveToggle ({ commit }) {
       commit('modalCreateElementActiveToggleM')
+    },
+
+    modalCreateElementActiveToggleErrors ({ commit }) {
+      commit('modalCreateElementActiveToggleErrorsM')
     },
 
     modalDeleteElementActiveToggle ({ commit }) {

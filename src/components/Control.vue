@@ -32,6 +32,14 @@ const props = defineProps({
     type: String,
     default: 'text'
   },
+  limit: {
+    type: Boolean,
+    default: false
+  },
+  limitNumber: {
+    type: Number,
+    default: 100
+  },
   modelValue: {
     type: [String, Number, Boolean, Array, Object],
     default: ''
@@ -139,6 +147,20 @@ if (props.ctrlKFocus) {
       :placeholder="placeholder"
       :required="required"
     />
+    <input
+      v-else-if="limit"
+      :id="id"
+      ref="inputEl"
+      v-model="computedValue"
+      :name="name"
+      :autocomplete="autocomplete"
+      :required="required"
+      :placeholder="placeholder"
+      :type="computedType"
+      :class="inputElClass"
+      :readonly="readOnly"
+      :max="limitNumber"
+    >
     <input
       v-else
       :id="id"

@@ -10,6 +10,7 @@ import JbButton from '@/components/JbButton.vue'
 import Field from '@/components/Field.vue'
 import Divider from '@/components/Divider.vue'
 import Control from '@/components/Control.vue'
+import CheckRadioPicker from '@/components/CheckRadioPicker.vue'
 
 const props = defineProps({
   checkable: Boolean,
@@ -17,6 +18,10 @@ const props = defineProps({
     default: 'device_id'
   },
   buttonSettingsModel: {
+    type: Boolean,
+    default: false
+  },
+  showRadioButtons1: {
     type: Boolean,
     default: false
   },
@@ -38,6 +43,14 @@ const props = defineProps({
   },
   typeElement: {
     default: 'element'
+  },
+  limit: {
+    type: Boolean,
+    default: false
+  },
+  limitNumber: {
+    type: Number,
+    default: 100
   }
 })
 
@@ -125,10 +138,15 @@ const getValueByKey = (keyName, row) => {
   return row[keyName]
 }
 
-const emit = defineEmits(['delete', 'edit', 'create', 'delete_item', 'create_item'])
+const emit = defineEmits(['delete', 'edit', 'create', 'delete_item', 'create_item', 'radio_elements'])
 
 const confirmClick = mode => {
   emit(mode, selection.value)
+}
+
+const confirmClickRadioElements = (mode, modelValue) => {
+  console.log('modelValue----------------------' + modelValue)
+  emit(mode, modelValue)
 }
 
 const confirmClickItem = (mode, index) => {
@@ -160,6 +178,7 @@ const confirmClickBulk = mode => {
 const clickEmitDelete = () => confirmClick('delete')
 const clickEmitBulkDelete = () => confirmClickBulk('delete')
 const clickEmitEdit = () => confirmClickUpdate('edit')
+const clickRadioElements = (modelValue) => confirmClickRadioElements('radio_elements', modelValue)
 const clickCancelElement = () => returnSelectionToOriginalValue()
 const clickEmitCreate = () => confirmClickCreate('create')
 
@@ -226,6 +245,7 @@ const initSelectionObj = () => {
 
 const initCreateObj = () => {
   for (const propertyName in props.itemTableColumns) {
+    console.log(props.itemTableColumns)
     const field = props.itemTableColumns[propertyName].field
     const initialValue = props.itemTableColumns[propertyName].initialValue
     if (initialValue !== undefined) {
@@ -262,6 +282,8 @@ const itemsElement = computed(() => ['', ' ', props.itemsBox].join(''))
 const buttonSettingsModelComputed = computed(() => {
   return store.getters.buttonSettingsModel || props.showItemsAlways
 })
+
+const radioElements = ref([])
 
 // const showElements = () => {
 //   console.log('value' + buttonSettingsModelComputed.value)
@@ -393,19 +415,87 @@ const showXButton = (item) => {
     has-cancel
     button-label="Save"
     is-model-from-state="modalCreateElementActiveToggle"
+    is-model-from-state-errors="modalCreateElementActiveToggleErrors"
+    is-model-from-state-errors-get="getModalCreateElementActiveErrors"
     @confirm="clickEmitCreate"
   >
-    <field
-      v-for="(item, index) in filteredEvents()"
-      :key="index"
-      :label="item.column"
-    >
-      <control
-        v-model="createObj[item.field]"
-        :type="item.type"
+    <field>
+      <check-radio-picker
+        v-if="showRadioButtons1"
+        v-model="radioElements"
+        name="buttons-switch"
+        type="switch"
+        :options="{ basic: 'Basic', time: 'Time', moisture: 'Moisture' }"
+        @update:modelValue="clickRadioElements"
       />
     </field>
-
+    <div
+      v-if="buttonSettingsModelComputed"
+    >
+      <field
+        v-for="(item, index) in filteredEvents()"
+        :key="index"
+        :label="item.column"
+      >
+        <control
+          v-if="item.type !== 'Array'"
+          v-model="createObj[item.field]"
+          :type="item.type"
+          :limit="limit"
+          :limit-number="limitNumber"
+        />
+        <div
+          v-if="item.type === 'Array'"
+          class="relative"
+        >
+          <field
+            v-for="(i, indexArr) in createObj[item.field]"
+            :key="indexArr"
+          >
+            <div class="grid gap-6 lg:grid-cols-3 lg:h-100 mb-6">
+              <div
+                v-for="(arrItem, indexItem) in i"
+                :key="indexItem"
+              >
+                <control
+                  v-if="item.arr[indexItem] === 'select'"
+                  v-model="i[indexItem]"
+                  type="select"
+                  :read-only="!!item.readOnly"
+                  :model-value="i[indexItem]"
+                  :options="weekdays"
+                />
+                <control
+                  v-if="item.arr[indexItem] !== 'select'"
+                  v-model="i[indexItem]"
+                  type="time"
+                  :read-only="!!item.readOnly"
+                />
+              </div>
+              <div
+                v-if="showXButton(item)"
+              >
+                <jb-buttons>
+                  <jb-button
+                    v-if="selectionObj[item.field].length"
+                    label="X"
+                    color="danger"
+                    @click="clickEmitDeleteItem(indexArr)"
+                  />
+                </jb-buttons>
+              </div>
+            </div>
+          </field>
+          <jb-buttons>
+            <jb-button
+              label="+"
+              color="info"
+              @click="clickEmitCreateItem"
+            />
+          </jb-buttons>
+        </div>
+      </field>
+    </div>
     <divider />
   </modal-box>
   <modal-box

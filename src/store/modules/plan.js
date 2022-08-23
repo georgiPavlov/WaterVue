@@ -19,15 +19,15 @@ const state = {
       field: 'plan_type',
       type: 'String',
       readOnly: true,
-      create: true,
-      initialValue: ''
+      create: false,
+      initialValue: 'basic'
     },
     {
       column: 'Water',
       field: 'water_volume',
       type: 'number',
       readOnly: true,
-      create: false,
+      create: true,
       initialValue: 100
     },
     {
@@ -53,15 +53,15 @@ const state = {
       field: 'plan_type',
       type: 'String',
       readOnly: true,
-      create: true,
-      initialValue: ''
+      create: false,
+      initialValue: 'time_based'
     },
     {
       column: 'Water',
       field: 'water_volume',
       type: 'number',
       readOnly: true,
-      create: false,
+      create: true,
       initialValue: 100
     },
     {
@@ -77,7 +77,7 @@ const state = {
       field: 'weekday_times',
       type: 'Array',
       readOnly: false,
-      create: false,
+      create: true,
       initialValue: 0,
       arr: { time_water: 'time', weekday: 'select' }
     }
@@ -96,15 +96,15 @@ const state = {
       field: 'plan_type',
       type: 'String',
       readOnly: true,
-      create: true,
-      initialValue: ''
+      create: false,
+      initialValue: 'moisture'
     },
     {
       column: 'Water',
       field: 'water_volume',
       type: 'number',
       readOnly: true,
-      create: false,
+      create: true,
       initialValue: 100
     },
     {
@@ -116,11 +116,11 @@ const state = {
       initialValue: 0
     },
     {
-      column: 'Water',
+      column: 'Moisture threshold',
       field: 'moisture_threshold',
       type: 'number',
       readOnly: false,
-      create: false,
+      create: true,
       initialValue: 100
     },
     {
@@ -128,7 +128,7 @@ const state = {
       field: 'check_interval',
       type: 'number',
       readOnly: false,
-      create: false,
+      create: true,
       initialValue: 100
     }
   ]

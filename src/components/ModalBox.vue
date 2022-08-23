@@ -15,6 +15,14 @@ const props = defineProps({
     type: String,
     default: null
   },
+  isModelFromStateErrors: {
+    type: String,
+    default: null
+  },
+  isModelFromStateErrorsGet: {
+    type: String,
+    default: null
+  },
   title: {
     type: String,
     default: null
@@ -46,12 +54,21 @@ const value = computed({
 })
 
 const confirmCancel = mode => {
+  emit(mode)
   if (props.isModelFromState === null) {
     value.value = false
   } else {
-    store.dispatch(props.isModelFromState)
+    if (props.isModelFromStateErrorsGet === null) {
+      store.dispatch(props.isModelFromState)
+    } else {
+      const errors = store.getters[props.isModelFromStateErrorsGet]
+      if (errors) {
+        store.dispatch(props.isModelFromStateErrors)
+      } else {
+        store.dispatch(props.isModelFromState)
+      }
+    }
   }
-  emit(mode)
 }
 
 const confirm = () => confirmCancel('confirm')
