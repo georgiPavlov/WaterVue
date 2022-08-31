@@ -145,12 +145,22 @@ const confirmClick = mode => {
 }
 
 const confirmClickRadioElements = (mode, modelValue) => {
+  initCreateObj()
   console.log('modelValue----------------------' + modelValue)
   emit(mode, modelValue)
 }
 
 const confirmClickItem = (mode, index) => {
   emit(mode, selectionObj, index)
+}
+
+const confirmClickItemNew = (mode, index) => {
+  emit(mode, createObj, index)
+}
+
+const confirmClickItemCreateObject = (mode) => {
+  console.log('create sub object' + createObj)
+  emit(mode, createObj)
 }
 
 const confirmClickCreate = mode => {
@@ -183,7 +193,9 @@ const clickCancelElement = () => returnSelectionToOriginalValue()
 const clickEmitCreate = () => confirmClickCreate('create')
 
 const clickEmitDeleteItem = (index) => confirmClickItem('delete_item', index)
+const clickEmitDeleteItemNew = (index) => confirmClickItemNew('delete_item_new', index)
 const clickEmitCreateItem = () => confirmClickItem('create_item')
+const clickEmitCreateItemCreateObject = () => confirmClickItemCreateObject('create_item_object_creator')
 
 const selection = ref()
 const selectionObj = reactive({})
@@ -251,7 +263,11 @@ const initCreateObj = () => {
     if (initialValue !== undefined) {
       createObj[field] = initialValue
     } else {
-      createObj[field] = ''
+      if (props.itemTableColumns[propertyName].type === 'Array') {
+        createObj[field] = {}
+      } else {
+        createObj[field] = ''
+      }
     }
   }
 }
@@ -297,6 +313,10 @@ const radioElements = ref([])
 
 const showXButton = (item) => {
   return selectionObj[item.field].length
+}
+
+const showXButtonNew = (item) => {
+  return createObj[item.field].length
 }
 </script>
 
@@ -473,14 +493,14 @@ const showXButton = (item) => {
                 />
               </div>
               <div
-                v-if="showXButton(item)"
+                v-if="showXButtonNew(item)"
               >
                 <jb-buttons>
                   <jb-button
-                    v-if="selectionObj[item.field].length"
+                    v-if="createObj[item.field].length"
                     label="X"
                     color="danger"
-                    @click="clickEmitDeleteItem(indexArr)"
+                    @click="clickEmitDeleteItemNew(indexArr)"
                   />
                 </jb-buttons>
               </div>
@@ -490,7 +510,7 @@ const showXButton = (item) => {
             <jb-button
               label="+"
               color="info"
-              @click="clickEmitCreateItem"
+              @click="clickEmitCreateItemCreateObject"
             />
           </jb-buttons>
         </div>

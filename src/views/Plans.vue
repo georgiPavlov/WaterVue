@@ -72,7 +72,25 @@ const modalCreateTimeItem = (selection) => {
   console.log(selection)
   console.log(defaultWeeekdayTime.value)
   const el = 'weekday_times'
-  selection[el].unshift(defaultWeeekdayTime.value)
+  if (selection[el].length < 7) {
+    selection[el].unshift(defaultWeeekdayTime.value)
+  }
+}
+
+const modalCreateTimeItemNew = (s) => {
+  console.log('item creator33')
+  console.log(s)
+  console.log(defaultWeeekdayTime.value)
+  const el = 'weekday_times'
+  if (s[el].length === 0) {
+    console.log('item creator 1----------------------------------------------------------------')
+    s[el].push(defaultWeeekdayTime.value)
+  } else {
+    console.log('item creator 2----------------------------------------------------------------')
+    if (s[el].length < 7) {
+      s[el].unshift(defaultWeeekdayTime.value)
+    }
+  }
 }
 
 const update = ref(true)
@@ -191,7 +209,9 @@ const show = false
         @create="modalCreatePlan"
         @edit="modalEditPlan"
         @create_item="modalCreateTimeItem"
+        @create_item_object_creator="modalCreateTimeItemNew"
         @delete_item="modalDeleteTimeItem"
+        @delete_item_new="modalDeleteTimeItem"
         @radio_elements="setAllButOneToFalse"
       />
     </card-component>

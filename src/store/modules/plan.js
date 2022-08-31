@@ -78,7 +78,7 @@ const state = {
       type: 'Array',
       readOnly: false,
       create: true,
-      initialValue: 0,
+      initialValue: [],
       arr: { time_water: 'time', weekday: 'select' }
     }
   ],
