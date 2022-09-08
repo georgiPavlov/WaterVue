@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onBeforeMount } from 'vue'
 import { mdiAccountMultiple } from '@mdi/js'
 import MainSection from '@/components/MainSection.vue'
 import ClientsTable from '@/components/ClientsTable.vue'
@@ -18,7 +18,7 @@ const store = useStore()
 
 const alert = ref(null)
 
-const plans = computed(() => store.getters.getPlansByType(type.value[0]))
+const plans = computed(() => store.getters.getPlansByType(type.value))
 
 const plansUpdateFields = computed(() => store.getters.getPlanUpdateFieldsState)
 
@@ -38,7 +38,7 @@ const modalCreatePlan = (plan) => {
   console.log('modalCreatePlan ' + plan.name)
   JSON.stringify(plan, null, '  ')
   // eslint-disable-next-line no-constant-condition
-  if (false) {
+  if (true) {
     alert.value.showAlert(
       'error',
       'modalCreatePlan'
@@ -72,7 +72,7 @@ const modalCreateTimeItem = (selection) => {
   console.log(selection)
   console.log(defaultWeeekdayTime.value)
   const el = 'weekday_times'
-  if (selection[el].length < 7) {
+  if (selection[el].length < 30) {
     selection[el].unshift(defaultWeeekdayTime.value)
   }
 }
@@ -87,7 +87,7 @@ const modalCreateTimeItemNew = (s) => {
     s[el].push(defaultWeeekdayTime.value)
   } else {
     console.log('item creator 2----------------------------------------------------------------')
-    if (s[el].length < 7) {
+    if (s[el].length < 30) {
       s[el].unshift(defaultWeeekdayTime.value)
     }
   }
@@ -95,47 +95,51 @@ const modalCreateTimeItemNew = (s) => {
 
 const update = ref(true)
 
-const buttonSettingsModel = ref([])
+const buttonSettingsModel = ref(['basic'])
 
-const type = ref([0])
+// const type = ref([0])
+
+const type = computed(() => store.getters.getPlanType)
+
+const initCurrentEl = () => {
+  store.dispatch('initCurrentPlans', store.getters.getPlanUpdateFieldsStateBasic)
+  store.dispatch('setPlanOperation', 0)
+}
+
+onBeforeMount(() => {
+  initCurrentEl()
+})
 
 const setAllButOneToFalse = (modelValue) => {
+  console.log('typeeeeee' + type.value)
   console.log('setAllButOneToFalse' + modelValue)
   let enable = false
   if (modelValue.length > 1) {
     modelValue.splice(modelValue.indexOf(modelValue[0]), 1)
+  }
+  console.log('len~~~~~~~~~~~~~~~~~~~~~~~~~~~' + modelValue.length)
+  if (modelValue.length === 0) {
+    modelValue[0] = 'basic'
   }
   console.log('modelValue basic')
   if (modelValue[0] === 'basic') {
     console.log('modelValue basic')
     store.dispatch('initCurrentPlans', store.getters.getPlanUpdateFieldsStateBasic)
     console.log('plans for basic' + plans.value)
-    while (type.value.length !== 0) {
-      type.value.pop()
-    }
-    type.value.push(0)
+    store.dispatch('setPlanOperation', 0)
     enable = true
   }
   if (modelValue[0] === 'moisture') {
     console.log('modelValue moisture')
     store.dispatch('initCurrentPlans', store.getters.getPlanUpdateFieldsStateMoisture)
     console.log('plans for moisture' + plans.value)
-    while (type.value.length !== 0) {
-      type.value.pop()
-    }
-    type.value.push(2)
-    console.log('type.value.push(2)' + type.value[0])
+    store.dispatch('setPlanOperation', 2)
     enable = true
   }
   if (modelValue[0] === 'time') {
     console.log('modelValue time_based')
     store.dispatch('initCurrentPlans', store.getters.getPlanUpdateFieldsStateTimeBased)
-    console.log('plans for time_based' + plans.value)
-    while (type.value.length !== 0) {
-      type.value.pop()
-    }
-    type.value.push(1)
-    console.log('type.value.push(1)' + type.value[0])
+    store.dispatch('setPlanOperation', 1)
     enable = true
   }
   if (enable === true) {

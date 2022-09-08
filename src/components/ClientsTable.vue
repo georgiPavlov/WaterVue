@@ -82,8 +82,10 @@ const checkedRows = ref([])
 
 const weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 
-const itemsPaginated = computed(
-  () => rows.value.slice(perPage.value * currentPage.value, perPage.value * (currentPage.value + 1))
+const itemsPaginated = computed(() => {
+  console.log('itemsPaginated' + JSON.stringify(rows.value))
+  return rows.value.slice(perPage.value * currentPage.value, perPage.value * (currentPage.value + 1))
+}
 )
 
 const numPages = computed(() => Math.ceil(items.value.length / perPage.value))
@@ -301,16 +303,6 @@ const buttonSettingsModelComputed = computed(() => {
 
 const radioElements = ref([])
 
-// const showElements = () => {
-//   console.log('value' + buttonSettingsModelComputed.value)
-//   if (buttonSettingsModelComputed.value || props.showItemsAlways) {
-//     console.log('value' + buttonSettingsModelComputed.value + ' true')
-//     return true
-//   }
-//   console.log('value' + buttonSettingsModelComputed.value + ' false')
-//   return false
-// }
-
 const showXButton = (item) => {
   return selectionObj[item.field].length
 }
@@ -318,6 +310,15 @@ const showXButton = (item) => {
 const showXButtonNew = (item) => {
   return createObj[item.field].length
 }
+
+const showItemsForNewItem = () => {
+  if (!props.showRadioButtons1) {
+    return true
+  } else {
+    return radioElements.value.length !== 0
+  }
+}
+
 </script>
 
 <template>
@@ -452,69 +453,71 @@ const showXButtonNew = (item) => {
     <div
       v-if="buttonSettingsModelComputed"
     >
-      <field
-        v-for="(item, index) in filteredEvents()"
-        :key="index"
-        :label="item.column"
-      >
-        <control
-          v-if="item.type !== 'Array'"
-          v-model="createObj[item.field]"
-          :type="item.type"
-          :limit="limit"
-          :limit-number="limitNumber"
-        />
-        <div
-          v-if="item.type === 'Array'"
-          class="relative"
+      <div v-if="showItemsForNewItem()">
+        <field
+          v-for="(item, index) in filteredEvents()"
+          :key="index"
+          :label="item.column"
         >
-          <field
-            v-for="(i, indexArr) in createObj[item.field]"
-            :key="indexArr"
+          <control
+            v-if="item.type !== 'Array'"
+            v-model="createObj[item.field]"
+            :type="item.type"
+            :limit="limit"
+            :limit-number="limitNumber"
+          />
+          <div
+            v-if="item.type === 'Array'"
+            class="relative"
           >
-            <div class="grid gap-6 lg:grid-cols-3 lg:h-100 mb-6">
-              <div
-                v-for="(arrItem, indexItem) in i"
-                :key="indexItem"
-              >
-                <control
-                  v-if="item.arr[indexItem] === 'select'"
-                  v-model="i[indexItem]"
-                  type="select"
-                  :read-only="!!item.readOnly"
-                  :model-value="i[indexItem]"
-                  :options="weekdays"
-                />
-                <control
-                  v-if="item.arr[indexItem] !== 'select'"
-                  v-model="i[indexItem]"
-                  type="time"
-                  :read-only="!!item.readOnly"
-                />
-              </div>
-              <div
-                v-if="showXButtonNew(item)"
-              >
-                <jb-buttons>
-                  <jb-button
-                    v-if="createObj[item.field].length"
-                    label="X"
-                    color="danger"
-                    @click="clickEmitDeleteItemNew(indexArr)"
+            <field
+              v-for="(i, indexArr) in createObj[item.field]"
+              :key="indexArr"
+            >
+              <div class="grid gap-6 lg:grid-cols-3 lg:h-100 mb-6">
+                <div
+                  v-for="(arrItem, indexItem) in i"
+                  :key="indexItem"
+                >
+                  <control
+                    v-if="item.arr[indexItem] === 'select'"
+                    v-model="i[indexItem]"
+                    type="select"
+                    :read-only="!!item.readOnly"
+                    :model-value="i[indexItem]"
+                    :options="weekdays"
                   />
-                </jb-buttons>
+                  <control
+                    v-if="item.arr[indexItem] !== 'select'"
+                    v-model="i[indexItem]"
+                    type="time"
+                    :read-only="!!item.readOnly"
+                  />
+                </div>
+                <div
+                  v-if="showXButtonNew(item)"
+                >
+                  <jb-buttons>
+                    <jb-button
+                      v-if="createObj[item.field].length"
+                      label="X"
+                      color="danger"
+                      @click="clickEmitDeleteItemNew(indexArr)"
+                    />
+                  </jb-buttons>
+                </div>
               </div>
-            </div>
-          </field>
-          <jb-buttons>
-            <jb-button
-              label="+"
-              color="info"
-              @click="clickEmitCreateItemCreateObject"
-            />
-          </jb-buttons>
-        </div>
-      </field>
+            </field>
+            <jb-buttons>
+              <jb-button
+                label="+"
+                color="info"
+                @click="clickEmitCreateItemCreateObject"
+              />
+            </jb-buttons>
+          </div>
+        </field>
+      </div>
     </div>
     <divider />
   </modal-box>

@@ -106,7 +106,8 @@ export default new Vuex.Store({
   getters: {
     getModalCreateElementActive: state => state.isModalElementPlanActive,
     getModalCreateElementActiveErrors: state => state.isModalElementPlanActiveErrors,
-    getModalDeleteElementActive: state => state.isModalDeleteElementActive
+    getModalDeleteElementActive: state => state.isModalDeleteElementActive,
+    getSelectedDevices: state => state.deviceSelect
   },
   actions: {
     setStyle ({ commit, dispatch }, payload) {
