@@ -161,6 +161,7 @@ const confirmClickItemNew = (mode, index) => {
 }
 
 const confirmClickItemCreateObject = (mode) => {
+  initCreateObj()
   console.log('create sub object' + createObj)
   emit(mode, createObj)
 }
@@ -259,6 +260,7 @@ const initSelectionObj = () => {
 
 const initCreateObj = () => {
   for (const propertyName in props.itemTableColumns) {
+    console.log('test init ~!!!!!!!!!!!!!!!!!!!!~!!!!!!!!!!!!!!!!!!~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
     console.log(props.itemTableColumns)
     const field = props.itemTableColumns[propertyName].field
     const initialValue = props.itemTableColumns[propertyName].initialValue

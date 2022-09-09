@@ -25,8 +25,6 @@ const plansUpdateFields = computed(() => store.getters.getPlanUpdateFieldsState)
 const titleStack = ref(['Admin', 'Tables'])
 
 const modalCreateElementActiveT = (plan) => {
-  JSON.stringify(plansUpdateFields.value, null, '  ')
-  console.info('plansUpdateFields.value ' + plansUpdateFields.value[1].column)
   store.dispatch('modalCreateElementActiveToggle')
 }
 
@@ -35,8 +33,7 @@ const modalDeleteElementActiveT = () => {
 }
 
 const modalCreatePlan = (plan) => {
-  console.log('modalCreatePlan ' + plan.name)
-  JSON.stringify(plan, null, '  ')
+  console.log('modalCreatePlan')
   // eslint-disable-next-line no-constant-condition
   if (true) {
     alert.value.showAlert(
@@ -49,15 +46,11 @@ const modalCreatePlan = (plan) => {
 }
 
 const modalEditPlan = (plan) => {
-  console.log('modalEditPlan2 ' + plan)
-  JSON.stringify(plan, null, '  ')
   store.dispatch('updatePlan', plan)
 }
 
 const modalDeletePlan = (selection) => {
-  console.log('test delete')
   store.dispatch('deletePlan', selection)
-  console.log('test delete2')
 }
 
 const modalDeleteTimeItem = (selection, index) => {
@@ -65,30 +58,28 @@ const modalDeleteTimeItem = (selection, index) => {
   selection[el].splice(index, 1)
 }
 
-const defaultWeeekdayTime = computed(() => store.getters.getDefaultElement)
-
 const modalCreateTimeItem = (selection) => {
-  console.log('item creator')
-  console.log(selection)
-  console.log(defaultWeeekdayTime.value)
+  const element = store.getters.getDefaultElement
+  const weekDayTimesValue = {}
+  weekDayTimesValue.time_water = element.time_water
+  weekDayTimesValue.weekday = element.weekday
   const el = 'weekday_times'
   if (selection[el].length < 30) {
-    selection[el].unshift(defaultWeeekdayTime.value)
+    selection[el].unshift(weekDayTimesValue)
   }
 }
 
 const modalCreateTimeItemNew = (s) => {
-  console.log('item creator33')
-  console.log(s)
-  console.log(defaultWeeekdayTime.value)
+  const element = store.getters.getDefaultElement
+  const weekDayTimesValue = {}
+  weekDayTimesValue.time_water = element.time_water
+  weekDayTimesValue.weekday = element.weekday
   const el = 'weekday_times'
   if (s[el].length === 0) {
-    console.log('item creator 1----------------------------------------------------------------')
-    s[el].push(defaultWeeekdayTime.value)
+    s[el].push(weekDayTimesValue)
   } else {
-    console.log('item creator 2----------------------------------------------------------------')
     if (s[el].length < 30) {
-      s[el].unshift(defaultWeeekdayTime.value)
+      s[el].unshift(weekDayTimesValue)
     }
   }
 }
@@ -96,8 +87,6 @@ const modalCreateTimeItemNew = (s) => {
 const update = ref(true)
 
 const buttonSettingsModel = ref(['basic'])
-
-// const type = ref([0])
 
 const type = computed(() => store.getters.getPlanType)
 
@@ -111,33 +100,24 @@ onBeforeMount(() => {
 })
 
 const setAllButOneToFalse = (modelValue) => {
-  console.log('typeeeeee' + type.value)
-  console.log('setAllButOneToFalse' + modelValue)
   let enable = false
   if (modelValue.length > 1) {
     modelValue.splice(modelValue.indexOf(modelValue[0]), 1)
   }
-  console.log('len~~~~~~~~~~~~~~~~~~~~~~~~~~~' + modelValue.length)
   if (modelValue.length === 0) {
     modelValue[0] = 'basic'
   }
-  console.log('modelValue basic')
   if (modelValue[0] === 'basic') {
-    console.log('modelValue basic')
     store.dispatch('initCurrentPlans', store.getters.getPlanUpdateFieldsStateBasic)
-    console.log('plans for basic' + plans.value)
     store.dispatch('setPlanOperation', 0)
     enable = true
   }
   if (modelValue[0] === 'moisture') {
-    console.log('modelValue moisture')
     store.dispatch('initCurrentPlans', store.getters.getPlanUpdateFieldsStateMoisture)
-    console.log('plans for moisture' + plans.value)
     store.dispatch('setPlanOperation', 2)
     enable = true
   }
   if (modelValue[0] === 'time') {
-    console.log('modelValue time_based')
     store.dispatch('initCurrentPlans', store.getters.getPlanUpdateFieldsStateTimeBased)
     store.dispatch('setPlanOperation', 1)
     enable = true
