@@ -175,8 +175,8 @@ const actions = {
   async updatePlan ({ commit }, plan) {
     console.log('updatePLan')
     const planCopy = { ...plan }
-    // delete planCopy.water_level
-    // delete planCopy.moisture_level
+    delete planCopy.is_running
+    delete planCopy.devices
     await axios.post(
       baseURL.concat('/gadget_communicator_pull/api/update_plan'),
       planCopy, options
@@ -274,7 +274,7 @@ const mutations = {
     }
   },
   removePlan: (state, idName) => {
-    (state.plans[state.planType] = state.plans[state.planType].filter(device => device.device_id !== idName))
+    (state.plans[state.planType] = state.plans[state.planType].filter(p => p.name !== idName))
   }
 }
 
