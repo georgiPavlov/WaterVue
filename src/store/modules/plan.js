@@ -11,7 +11,7 @@ const state = {
       column: 'Name',
       field: 'name',
       type: 'String',
-      readOnly: false,
+      readOnly: true,
       create: true,
       initialValue: ''
     },
@@ -24,10 +24,10 @@ const state = {
       initialValue: 'basic'
     },
     {
-      column: 'Water',
+      column: 'Water in milliliters',
       field: 'water_volume',
       type: 'number',
-      readOnly: true,
+      readOnly: false,
       create: true,
       initialValue: 100
     },
@@ -37,6 +37,7 @@ const state = {
       type: 'Bool',
       readOnly: true,
       create: false,
+      hide: false,
       initialValue: 0
     }
   ],
@@ -45,7 +46,7 @@ const state = {
       column: 'Name',
       field: 'name',
       type: 'String',
-      readOnly: false,
+      readOnly: true,
       create: true,
       initialValue: ''
     },
@@ -58,10 +59,10 @@ const state = {
       initialValue: 'time_based'
     },
     {
-      column: 'Water',
+      column: 'Water in milliliters',
       field: 'water_volume',
       type: 'number',
-      readOnly: true,
+      readOnly: false,
       create: true,
       initialValue: 100
     },
@@ -88,7 +89,7 @@ const state = {
       column: 'Name',
       field: 'name',
       type: 'String',
-      readOnly: false,
+      readOnly: true,
       create: true,
       initialValue: ''
     },
@@ -101,10 +102,10 @@ const state = {
       initialValue: 'moisture'
     },
     {
-      column: 'Water',
+      column: 'Water in milliliters',
       field: 'water_volume',
       type: 'number',
-      readOnly: true,
+      readOnly: false,
       create: true,
       initialValue: 100
     },
@@ -171,17 +172,38 @@ const getters = {
 }
 
 const actions = {
+  async updatePlan ({ commit }, plan) {
+    console.log('updatePLan')
+    const planCopy = { ...plan }
+    // delete planCopy.water_level
+    // delete planCopy.moisture_level
+    await axios.post(
+      baseURL.concat('/gadget_communicator_pull/api/update_plan'),
+      planCopy, options
+    ).catch(
+      function (error) {
+        console.log('Show error notification!')
+        return Promise.reject(error)
+      }
+    )
+    commit('updatePlan', plan)
+  },
+  async deletePlan ({ commit }, idName) {
+    console.log('delete plan' + idName)
+    const url = baseURL.concat('/gadget_communicator_pull/api/delete_plan/').concat(idName)
+    await axios.delete(url, options).catch(
+      function (error) {
+        console.log('Show error notification!')
+        return Promise.reject(error)
+      }
+    )
+    commit('removePlan', idName)
+  },
   setButtonSettingsModel ({ commit }) {
     commit('setButtonSettingsModelM')
   },
   setPlanOperation ({ commit }, type) {
     commit('setPlanOperation', type)
-  },
-  setPlanType ({ commit }, type) {
-    commit('setPlanType', type)
-  },
-  popPlanType ({ commit }) {
-    commit('popPlanType')
   },
   async initCurrentPlans ({ commit }, plans) {
     console.log('initCurrentPlans')
@@ -197,24 +219,15 @@ const actions = {
           return Promise.reject(error)
         }
       )
-    console.log('beforeset')
-    console.log('fetchPlans' + response.data)
     commit('setPlans', response.data)
   },
   async addPlan ({ commit, getters }, p) {
-    console.log('plan')
     const dd = getters.getDevice
-    console.log('device select------------------------------------------------------' + JSON.stringify(dd))
-    console.log('device select------------------------------------------------------' + JSON.stringify(dd.device_id))
     const deviceId = dd.device_id
     const plan = { ...p }
     plan.devices = []
-    // plan.devices.device_id = deviceId
-
     plan.devices.push({ device_id: deviceId })
     const planWithDeviceId = JSON.stringify(plan)
-    console.log('12result@@@@@@@@@@@@@@@@@@@@' + JSON.stringify(planWithDeviceId))
-    console.log('result@@@@@@@@@@@@@@@@@@@@' + JSON.stringify(plan))
     const response = await axios.post(
       baseURL.concat('/gadget_communicator_pull/api/create_plan'),
       planWithDeviceId, options
@@ -222,9 +235,6 @@ const actions = {
       function (error) {
         if (error.response) {
           console.log('addPlan')
-          // console.log(error.response.data)
-          // console.log(error.response.status)
-          // console.log(error.response.headers)
         }
         console.log('Show error notification!')
         return Promise.reject(error)
@@ -236,17 +246,11 @@ const actions = {
 }
 
 const mutations = {
-  setPlanType (state, planType) {
-    state.planType.push(planType)
-  },
   setPlanOperation (state, planType) {
     while (state.planType.length !== 0) {
       state.planType.pop()
     }
     state.planType.push(planType)
-  },
-  popPlanType (state) {
-    state.planType.pop()
   },
   minitCurrentPlans (state, plans) {
     state.planUpdateFieldsState = plans
@@ -261,6 +265,16 @@ const mutations = {
   },
   setButtonSettingsModelM (state) {
     state.buttonSettingsModel = !state.buttonSettingsModel
+  },
+  updatePlan: (state, planUpdate) => {
+    const index = state.plans[state.planType].findIndex(plan => plan.name === planUpdate.name)
+    if (index !== -1) {
+      state.plans[state.planType].splice(index, 1, planUpdate)
+      console.log(planUpdate)
+    }
+  },
+  removePlan: (state, idName) => {
+    (state.plans[state.planType] = state.plans[state.planType].filter(device => device.device_id !== idName))
   }
 }
 
