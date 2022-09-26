@@ -33,22 +33,41 @@ const modalDeleteElementActiveT = () => {
   store.dispatch('modalDeleteElementActiveToggle')
 }
 
-const modalCreateDevice = (device) => {
+const handleErrors = () => {
+  const errors = computed(() => store.getters.getErrors)
+  if (errors.value !== 'none') {
+    alert.value.showAlert(
+      'error',
+      errors.value
+    )
+    store.dispatch('modalCreateElementActiveToggleErrorsFalse')
+  }
+}
+
+const modalCreateDevice = (device, errorsHandler) => {
   console.log('modalCreateDevice ' + device.label)
   JSON.stringify(device, null, '  ')
-  store.dispatch('addDevice', device)
+  store.dispatch('addDevice', device).then(() => {
+    handleErrors()
+    errorsHandler()
+  })
 }
 
-const modalEditDevice = (device) => {
+const modalEditDevice = (device, errorsHandler) => {
   console.log('modalEditDevice2 ' + device)
   JSON.stringify(device, null, '  ')
-  store.dispatch('updateDevice', device)
+  store.dispatch('updateDevice', device).then(() => {
+    handleErrors()
+    errorsHandler()
+  })
 }
 
-const modalDeleteDevice = (selection) => {
+const modalDeleteDevice = (selection, errorsHandler) => {
   console.log('test delete')
-  store.dispatch('deleteDevice', selection)
-  console.log('test delete2')
+  store.dispatch('deleteDevice', selection).then(() => {
+    handleErrors()
+    errorsHandler()
+  })
 }
 
 const update = ref(true)

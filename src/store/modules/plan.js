@@ -2,6 +2,7 @@ import axios from 'axios'
 
 const state = {
   plans: [],
+  deletePlan: { name: 'default_stop', plan_type: 'delete' },
   planUpdateFieldsState: [],
   planType: [0],
   buttonSettingsModel: false,
@@ -34,11 +35,11 @@ const state = {
     {
       column: 'Has Been Executed',
       field: 'has_been_executed',
-      type: 'Bool',
+      type: 'button',
       readOnly: true,
       create: false,
       hide: false,
-      initialValue: 0
+      initialValue: false
     }
   ],
   planUpdateFieldsStateTime: [
@@ -69,10 +70,10 @@ const state = {
     {
       column: 'Is running',
       field: 'is_running',
-      type: 'String',
+      type: 'button',
       readOnly: true,
       create: false,
-      initialValue: 0
+      initialValue: false
     },
     {
       column: 'Weekday Times',
@@ -82,6 +83,14 @@ const state = {
       create: true,
       initialValue: [],
       arr: { time_water: 'time', weekday: 'select' }
+    },
+    {
+      column: 'Execute only once',
+      field: 'execute_only_once',
+      type: 'checkbox',
+      readOnly: false,
+      create: true,
+      initialValue: false
     }
   ],
   planUpdateFieldsStateMoisture: [
@@ -112,10 +121,10 @@ const state = {
     {
       column: 'Is Running',
       field: 'has_been_executed',
-      type: 'Bool',
+      type: 'button',
       readOnly: true,
       create: false,
-      initialValue: 0
+      initialValue: false
     },
     {
       column: 'Moisture threshold',
@@ -154,46 +163,106 @@ const getters = {
   getDefaultElement: state => state.addWeekdayTimeDefaultElement,
   buttonSettingsModel: state => state.buttonSettingsModel,
   getPlansByName: (state) => (name) => {
-    return state.plans.find((d) => d.name === name)
+    return state.plans[state.planType].find((d) => d.name === name)
   },
   getPlansByType: (state) => (type) => {
     return state.plans[type]
+  },
+  getClickButtonCompareValue: (state) => {
+    if (state.planUpdateFieldsState === undefined || state.planUpdateFieldsState.length === 0) {
+      return true
+    }
+    return true
+    // return !(state.planType.at(0) === 2 || state.planType.at(0) === 1)
   },
   getPlanUpdateFieldsState: state => state.planUpdateFieldsState,
   getPlanUpdateFieldsStateBasic: state => state.planUpdateFieldsStateBasic,
   getPlanUpdateFieldsStateMoisture: state => state.planUpdateFieldsStateMoisture,
   getPlanUpdateFieldsStateTimeBased: state => state.planUpdateFieldsStateTime,
   getDevice: (state, getters, rootState, rootGetters) => {
-    console.log(state)
-    console.log('$$$$$$$$$$$$$$' + rootGetters)
-    console.log(rootState)
     return rootGetters.getCurrentDevice
   }
 }
 
 const actions = {
-  async updatePlan ({ commit }, plan) {
-    console.log('updatePLan')
+  async restartPLanExecution ({ commit }, payload) {
+    const plan = payload.plan_
+    const type = payload.type_
     const planCopy = { ...plan }
     delete planCopy.is_running
     delete planCopy.devices
+    if (type === 2 || type === 1) {
+      planCopy.has_been_executed = false
+    } else {
+      planCopy.has_been_executed = false
+    }
     await axios.post(
       baseURL.concat('/gadget_communicator_pull/api/update_plan'),
       planCopy, options
     ).catch(
       function (error) {
-        console.log('Show error notification!')
-        return Promise.reject(error)
+        console.log('Show error notification!' + JSON.stringify(error.response.data))
+        commit('setErrors', error.response.data)
       }
     )
     commit('updatePlan', plan)
   },
-  async deletePlan ({ commit }, idName) {
-    console.log('delete plan' + idName)
+  async updatePlan ({ commit }, plan) {
+    const planCopy = { ...plan }
+    delete planCopy.is_running
+    delete planCopy.devices
+    if (planCopy.plan_type === 'time_based') {
+      if (planCopy.execute_only_once === false) {
+        delete planCopy.execute_only_once
+      }
+    }
+    await axios.post(
+      baseURL.concat('/gadget_communicator_pull/api/update_plan'),
+      planCopy, options
+    ).catch(
+      function (error) {
+        console.log('Show error notification!' + JSON.stringify(error.response.data))
+        commit('setErrors', error.response.data)
+      }
+    )
+    commit('updatePlan', plan)
+  },
+
+  async stopPlan ({ commit, getters }, idName) {
+    const deletePlanCopy = { ...state.deletePlan }
+    deletePlanCopy.plan_to_stop = idName
+    await axios.post(
+      baseURL.concat('/gadget_communicator_pull/api/update_plan'),
+      deletePlanCopy, options
+    ).catch(
+      function (error) {
+        console.log('Show error notification!' + JSON.stringify(error.response.data))
+        commit('setErrors', error.response.data)
+      }
+    )
+  },
+
+  async deletePlan ({ commit, getters }, idName) {
+    const plan = getters.getPlansByName(idName)
+    if (plan.plan_type === 'moisture' || plan.plan_type === 'time_based') {
+      if (plan.is_running) {
+        const deletePlanCopy = { ...state.deletePlan }
+        deletePlanCopy.plan_to_stop = idName
+        await axios.post(
+          baseURL.concat('/gadget_communicator_pull/api/update_plan'),
+          deletePlanCopy, options
+        ).catch(
+          function (error) {
+            console.log('Show error notification!' + JSON.stringify(error.response.data))
+            commit('setErrors', error.response.data)
+          }
+        )
+      }
+    }
     const url = baseURL.concat('/gadget_communicator_pull/api/delete_plan/').concat(idName)
     await axios.delete(url, options).catch(
       function (error) {
-        console.log('Show error notification!')
+        console.log('Show error notification!' + JSON.stringify(error.response.data))
         return Promise.reject(error)
       }
     )
@@ -206,42 +275,43 @@ const actions = {
     commit('setPlanOperation', type)
   },
   async initCurrentPlans ({ commit }, plans) {
-    console.log('initCurrentPlans')
     commit('minitCurrentPlans', plans)
   },
   async fetchPlans ({ commit }) {
-    console.log('fetchPlans')
     const response = await axios.get(
       baseURL.concat('/gadget_communicator_pull/api/list_plans'), options)
-      .catch(
-        function (error) {
-          console.log('Show error notification!')
-          return Promise.reject(error)
-        }
-      )
+      .catch(error => {
+        console.log('Show error notification!' + JSON.stringify(error.response.data))
+        return Promise.reject(error)
+      })
     commit('setPlans', response.data)
   },
   async addPlan ({ commit, getters }, p) {
     const dd = getters.getDevice
     const deviceId = dd.device_id
-    const plan = { ...p }
-    plan.devices = []
-    plan.devices.push({ device_id: deviceId })
-    const planWithDeviceId = JSON.stringify(plan)
+    const planCopy = { ...p }
+    planCopy.devices = []
+    planCopy.devices.push({ device_id: deviceId })
+    if (planCopy.plan_type === 'time_based') {
+      if (planCopy.execute_only_once === false) {
+        delete planCopy.execute_only_once
+      }
+    }
+    if (planCopy.plan_type === 'moisture' || planCopy.plan_type === 'time_based') {
+      delete planCopy.is_running
+    }
+    delete planCopy.has_been_executed
+    const planWithDeviceId = JSON.stringify(planCopy)
     const response = await axios.post(
       baseURL.concat('/gadget_communicator_pull/api/create_plan'),
       planWithDeviceId, options
-    ).catch(
-      function (error) {
-        if (error.response) {
-          console.log('addPlan')
-        }
-        console.log('Show error notification!')
-        return Promise.reject(error)
-      }
-    )
-
-    commit('newPlan', response.data)
+    ).catch(error => {
+      console.log('Show error notification!' + JSON.stringify(error.response.data))
+      commit('setErrors', error.response.data)
+    })
+    if (getters.getErrors === 'none') {
+      commit('newPlan', response.data)
+    }
   }
 }
 
@@ -254,11 +324,9 @@ const mutations = {
   },
   minitCurrentPlans (state, plans) {
     state.planUpdateFieldsState = plans
-    console.log('minitCurrentPlans')
   },
   setPlans (state, plans) {
     (state.plans = plans)
-    console.log('setPlans ' + plans)
   },
   newPlan: (state, plan) => {
     state.plans[state.planType].unshift(plan)
@@ -270,7 +338,6 @@ const mutations = {
     const index = state.plans[state.planType].findIndex(plan => plan.name === planUpdate.name)
     if (index !== -1) {
       state.plans[state.planType].splice(index, 1, planUpdate)
-      console.log(planUpdate)
     }
   },
   removePlan: (state, idName) => {

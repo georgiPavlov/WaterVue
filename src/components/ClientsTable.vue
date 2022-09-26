@@ -1,7 +1,7 @@
 <script setup>
 import { computed, onBeforeMount, reactive, ref, toRaw, toRef, watch } from 'vue'
 import { useStore } from 'vuex'
-import { mdiEye, mdiTrashCan } from '@mdi/js'
+import { mdiEye, mdiTrashCan, mdiRestart, mdiRayVertex } from '@mdi/js'
 import ModalBox from '@/components/ModalBox.vue'
 import CheckboxCell from '@/components/CheckboxCell.vue'
 import Level from '@/components/Level.vue'
@@ -11,6 +11,9 @@ import Field from '@/components/Field.vue'
 import Divider from '@/components/Divider.vue'
 import Control from '@/components/Control.vue'
 import CheckRadioPicker from '@/components/CheckRadioPicker.vue'
+import VueBasicAlert from 'vue-basic-alert'
+
+const alert = ref(null)
 
 const props = defineProps({
   checkable: Boolean,
@@ -66,10 +69,6 @@ const tableTrOddStyle = computed(() => store.state.tableTrOddStyle)
 
 const darkMode = computed(() => store.state.darkMode)
 
-const items = computed(() => store.state.clients)
-
-const isModalActive = ref(false)
-
 const isModalActiveItems = ref(false)
 
 const isModalDangerActive = ref(false)
@@ -83,12 +82,11 @@ const checkedRows = ref([])
 const weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 
 const itemsPaginated = computed(() => {
-  console.log('itemsPaginated' + JSON.stringify(rows.value))
   return rows.value.slice(perPage.value * currentPage.value, perPage.value * (currentPage.value + 1))
 }
 )
 
-const numPages = computed(() => Math.ceil(items.value.length / perPage.value))
+const numPages = computed(() => Math.ceil(rows.value.length / perPage.value))
 
 const currentPageHuman = computed(() => currentPage.value + 1)
 
@@ -121,7 +119,6 @@ const checked = (isChecked, selection) => {
     checkedRowsBools.value.push(isChecked)
     checkedRows.value.push(selection)
   } else {
-    console.log('remove')
     checkedRows.value = remove(checkedRows.value, row => row[props.idName] === selection[props.idName])
   }
 }
@@ -140,15 +137,12 @@ const getValueByKey = (keyName, row) => {
   return row[keyName]
 }
 
-const emit = defineEmits(['delete', 'edit', 'create', 'delete_item', 'create_item', 'radio_elements'])
-
-const confirmClick = mode => {
-  emit(mode, selection.value)
+const confirmClick = (mode, errorsHandler) => {
+  emit(mode, selection.value, errorsHandler)
 }
 
 const confirmClickRadioElements = (mode, modelValue) => {
   initCreateObj()
-  console.log('modelValue----------------------' + modelValue)
   emit(mode, modelValue)
 }
 
@@ -162,25 +156,24 @@ const confirmClickItemNew = (mode, index) => {
 
 const confirmClickItemCreateObject = (mode) => {
   initCreateObj()
-  console.log('create sub object' + createObj)
   emit(mode, createObj)
 }
 
-const confirmClickCreate = mode => {
+const confirmClickCreate = (mode, errorsHandler) => {
   const copy = toRaw(createObj)
-  emit(mode, copy)
+  emit(mode, copy, errorsHandler)
 }
 
-const confirmClickUpdate = mode => {
+const confirmClickUpdate = (mode, errorsHandler) => {
   const copy = toRaw(selectionObj)
-  emit(mode, copy)
+  emit(mode, copy, errorsHandler)
 }
 
-const confirmClickBulk = mode => {
+const confirmClickBulk = (mode, errorsHandler) => {
   // eslint-disable-next-line no-unused-vars
   const arr = [...checkedRows.value]
   arr.forEach(item => {
-    emit(mode, item[props.idName])
+    emit(mode, item[props.idName], errorsHandler)
     checked(false, item)
   })
   checkedRowsBools.value.forEach(item => {
@@ -188,17 +181,21 @@ const confirmClickBulk = mode => {
   })
 }
 
-const clickEmitDelete = () => confirmClick('delete')
-const clickEmitBulkDelete = () => confirmClickBulk('delete')
-const clickEmitEdit = () => confirmClickUpdate('edit')
+const emit = defineEmits(['delete', 'edit', 'create', 'delete_item', 'create_item', 'radio_elements'])
+const clickEmitDelete = (errorsHandler) => confirmClick('delete', errorsHandler)
+const clickEmitBulkDelete = (errorsHandler) => confirmClickBulk('delete', errorsHandler)
+const clickEmitEdit = (errorsHandler) => confirmClickUpdate('edit', errorsHandler)
 const clickRadioElements = (modelValue) => confirmClickRadioElements('radio_elements', modelValue)
 const clickCancelElement = () => returnSelectionToOriginalValue()
-const clickEmitCreate = () => confirmClickCreate('create')
+const clickEmitCreate = (errorsHandler) => confirmClickCreate('create', errorsHandler)
 
 const clickEmitDeleteItem = (index) => confirmClickItem('delete_item', index)
 const clickEmitDeleteItemNew = (index) => confirmClickItemNew('delete_item_new', index)
 const clickEmitCreateItem = () => confirmClickItem('create_item')
 const clickEmitCreateItemCreateObject = () => confirmClickItemCreateObject('create_item_object_creator')
+
+const sendEmitViewItemsStartEmit = (row) => sendEmitViewItemsStart(row, 'restart_operation')
+const sendRestartExecutionEmit = (row) => sendRestartExecution(row, 'restart_operation_on_run')
 
 const selection = ref()
 const selectionObj = reactive({})
@@ -227,7 +224,7 @@ const sendEmitDelete = (row) => {
 }
 
 const sendEmitEdit = (row) => {
-  isModalActive.value = true
+  store.dispatch('modalUpdateElementActiveToggle')
   selection.value = getValueByKey(props.idName, row)
   convertToReactive(row)
 }
@@ -236,6 +233,26 @@ const sendEmitViewItems = (row) => {
   isModalActiveItems.value = true
   selection.value = getValueByKey(props.idName, row)
   convertToReactive(row)
+}
+
+const sendEmitViewItemsStart = (row, mode) => {
+  selection.value = getValueByKey(props.idName, row)
+  convertToReactive(row)
+  emit(mode, selection.value)
+  alert.value.showAlert(
+    'success',
+    'Plan restarted: ' + selection.value
+  )
+}
+
+const sendRestartExecution = (row, mode) => {
+  selection.value = getValueByKey(props.idName, row)
+  convertToReactive(row)
+  emit(mode, selection.value)
+  alert.value.showAlert(
+    'warning',
+    'Running plan stopped: ' + selection.value
+  )
 }
 
 const convertToReactive = (row) => {
@@ -260,8 +277,6 @@ const initSelectionObj = () => {
 
 const initCreateObj = () => {
   for (const propertyName in props.itemTableColumns) {
-    console.log('test init ~!!!!!!!!!!!!!!!!!!!!~!!!!!!!!!!!!!!!!!!~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
-    console.log(props.itemTableColumns)
     const field = props.itemTableColumns[propertyName].field
     const initialValue = props.itemTableColumns[propertyName].initialValue
     if (initialValue !== undefined) {
@@ -289,15 +304,23 @@ onBeforeMount(() => {
 
 const modalCreateElementActive = computed(() => store.getters.getModalCreateElementActive)
 
+const modalUpdateElementActive = computed(() => store.getters.getModalUpdateElementActive)
+
 const modalDeleteElementActive = computed(() => store.getters.getModalDeleteElementActive)
 
 const createElement = computed(() => ['Create', ' ', props.typeElement].join(''))
 
 const editElement = computed(() => ['Edit', ' ', props.typeElement].join(''))
 
-const DeleteElement = computed(() => ['Delete', ' ', props.typeElement].join(''))
+const DeleteElement = computed(() => ['Do you confirm deletion of', ' ', props.typeElement, 's'].join(''))
 
 const itemsElement = computed(() => ['', ' ', props.itemsBox].join(''))
+
+const buttonCompareValue = computed(() => store.getters.getClickButtonCompareValue)
+
+watch(() => buttonCompareValue.value, () => {
+  console.log(buttonCompareValue.value)
+})
 
 const buttonSettingsModelComputed = computed(() => {
   return store.getters.buttonSettingsModel || props.showItemsAlways
@@ -325,10 +348,14 @@ const showItemsForNewItem = () => {
 
 <template>
   <modal-box
-    v-model="isModalActive"
+    v-model="modalUpdateElementActive"
     :large-title="editElement"
     button="success"
     button-label="Save"
+    has-cancel
+    is-model-from-state="modalUpdateElementActiveToggle"
+    is-model-from-state-errors="cleanErrors"
+    is-model-from-state-errors-get="getErrors"
     @confirm="clickEmitEdit"
     @cancel="clickCancelElement"
   >
@@ -438,8 +465,8 @@ const showItemsForNewItem = () => {
     has-cancel
     button-label="Save"
     is-model-from-state="modalCreateElementActiveToggle"
-    is-model-from-state-errors="modalCreateElementActiveToggleErrors"
-    is-model-from-state-errors-get="getModalCreateElementActiveErrors"
+    is-model-from-state-errors="cleanErrors"
+    is-model-from-state-errors-get="getErrors"
     @confirm="clickEmitCreate"
   >
     <field>
@@ -526,10 +553,12 @@ const showItemsForNewItem = () => {
   <modal-box
     v-model="modalDeleteElementActive"
     :large-title="DeleteElement"
-    button="success"
+    button="warning"
     has-cancel
     button-label="Save"
     is-model-from-state="modalDeleteElementActiveToggle"
+    is-model-from-state-errors="cleanErrors"
+    is-model-from-state-errors-get="getErrors"
     @confirm="clickEmitBulkDelete"
   >
     <divider />
@@ -590,11 +619,29 @@ const showItemsForNewItem = () => {
             :key="i"
             :data-label="item.column"
           >
-            <div v-if="item.type !== 'Array'">
+            <div v-if="item.type !== 'Array' && item.type !== 'button' && item.type !== 'checkbox'">
               {{ getValueByKey(item.field, row) }}
             </div>
+            <div v-else-if="item.type === 'button'">
+              <div v-if="getValueByKey(item.field, row) !== buttonCompareValue">
+                <jb-button
+                  color="info"
+                  :icon="mdiRestart"
+                  small
+                  @click="sendEmitViewItemsStartEmit(row)"
+                />
+              </div>
+              <div v-else>
+                <jb-button
+                  color="success"
+                  :icon="mdiRayVertex"
+                  small
+                  @click="sendRestartExecutionEmit(row)"
+                />
+              </div>
+            </div>
             <div
-              v-else
+              v-else-if="item.type === 'Array'"
               class="place-items-center"
             >
               <jb-button
@@ -603,6 +650,18 @@ const showItemsForNewItem = () => {
                 small
                 @click="sendEmitViewItems(row)"
               />
+            </div>
+            <div v-else-if="item.type === 'checkbox'">
+              <div v-if="getValueByKey(item.field, row) !== buttonCompareValue">
+                <jb-button
+                  color="light"
+                />
+              </div>
+              <div v-else>
+                <jb-button
+                  color="success"
+                />
+              </div>
             </div>
           </td>
           <td class="actions-cell">
@@ -647,4 +706,9 @@ const showItemsForNewItem = () => {
       <small>Page {{ currentPageHuman }} of {{ numPages }}</small>
     </level>
   </div>
+  <vue-basic-alert
+    ref="alert"
+    :duration="500"
+    :close-in="2000"
+  />
 </template>

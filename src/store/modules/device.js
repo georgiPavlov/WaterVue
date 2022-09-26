@@ -68,15 +68,12 @@ const options = {
 }
 const actions = {
   async initCurrentDevice ({ commit }) {
-    console.log('beforeset')
     commit('mInitCurrentDeviceLabel')
   },
   async setDeviceLabel ({ commit }, device) {
-    console.log('dfdsf')
     commit('mSetDeviceSelect', device)
   },
   async fetchDevices ({ commit }) {
-    console.log('beforeset')
     const response = await axios.get(
       baseURL.concat('/gadget_communicator_pull/api/list_devices'), options)
       .catch(
@@ -85,7 +82,6 @@ const actions = {
           return Promise.reject(error)
         }
       )
-    console.log('beforeset')
     commit('setDevices', response.data)
   },
   async addDevice ({ commit }, device) {
@@ -95,19 +91,18 @@ const actions = {
     ).catch(
       function (error) {
         console.log('Show error notification!')
-        return Promise.reject(error)
+        commit('setErrors', error.response.data)
       }
     )
 
     commit('newDevice', response.data)
   },
   async deleteDevice ({ commit }, id) {
-    console.log('device_delete ' + id)
     const url = baseURL.concat('/gadget_communicator_pull/api/delete_device/').concat(id)
     await axios.delete(url, options).catch(
       function (error) {
         console.log('Show error notification!')
-        return Promise.reject(error)
+        commit('setErrors', error.response.data)
       }
     )
     commit('removeDevice', id)
@@ -134,14 +129,12 @@ const actions = {
     ).catch(
       function (error) {
         console.log('Show error notification!')
-        return Promise.reject(error)
+        commit('setErrors', error.response.data)
       }
     )
     commit('updateDevice', updDevice)
   },
   async fetchDeviceWaterCharts ({ commit }, id) {
-    console.log('initCharts')
-    console.log(id.value)
     const url = baseURL.concat('/gadget_communicator_pull/api/list_device_charts/').concat(id)
     const response = await axios.get(url, options)
       .catch(
@@ -150,9 +143,6 @@ const actions = {
           return Promise.reject(error)
         }
       )
-
-    console.log(response.data)
-
     commit('getDeviceWaterCharts', response.data)
   }
 }
@@ -161,21 +151,16 @@ const mutations = {
   mInitCurrentDeviceLabel (state) {
     if (state.deviceSelect === null) {
       (state.deviceSelect = state.devices.length !== 0 ? state.devices[0] : null)
-      console.log('changing current device')
     }
-    console.log('mInitCurrentDeviceLabel')
   },
   mSetDeviceSelect (state, device) {
     (state.deviceSelect = device)
-    console.log('setDeviceSelect')
   },
   setDevices (state, devices) {
     (state.devices = devices)
-    console.log('afterset2')
   },
   getDeviceWaterCharts (state, deviceWaterChart) {
     (state.deviceWaterChart = deviceWaterChart)
-    console.log('chartset2')
   },
   newDevice: (state, device) => state.devices.unshift(device),
   removeDevice: (state, id) =>
@@ -184,7 +169,6 @@ const mutations = {
     const index = state.devices.findIndex(device => device.id === updDevice.id)
     if (index !== -1) {
       state.devices.splice(index, 1, updDevice)
-      console.log(updDevice)
     }
   }
 }

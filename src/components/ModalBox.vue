@@ -54,24 +54,32 @@ const value = computed({
 })
 
 const confirmCancel = mode => {
-  emit(mode)
   if (props.isModelFromState === null) {
+    emit(mode)
     value.value = false
   } else {
-    if (props.isModelFromStateErrorsGet === null) {
+    if (props.isModelFromStateErrorsGet === null || mode === 'cancel') {
       store.dispatch(props.isModelFromState)
+      emit(mode)
     } else {
-      const errors = store.getters[props.isModelFromStateErrorsGet]
-      if (errors) {
-        store.dispatch(props.isModelFromStateErrors)
-      } else {
-        store.dispatch(props.isModelFromState)
-      }
+      emit(mode, () => errorsHandler())
     }
   }
 }
 
-const confirm = () => confirmCancel('confirm')
+const errorsHandler = () => {
+  const errors = store.getters[props.isModelFromStateErrorsGet]
+  if (errors === 'none') {
+    store.dispatch(props.isModelFromState)
+  } else {
+    store.dispatch(props.isModelFromStateErrors)
+    store.dispatch('cleanErrors')
+  }
+}
+
+const confirm = () => {
+  confirmCancel('confirm')
+}
 
 const cancel = () => confirmCancel('cancel')
 </script>

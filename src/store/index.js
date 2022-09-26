@@ -7,6 +7,7 @@ import plan from './modules/plan'
 import createPersistedState from 'vuex-persistedstate'
 
 export default new Vuex.Store({
+  errors: 'none',
   plugins: [createPersistedState()],
   state: {
     /* Styles */
@@ -53,6 +54,8 @@ export default new Vuex.Store({
     /* Tables create a element */
     isModalElementPlanActive: false,
 
+    isModalElementPlanActiveUpdate: false,
+
     isModalElementPlanActiveErrors: false,
 
     isModalDeleteElementActive: false
@@ -90,26 +93,39 @@ export default new Vuex.Store({
     /* Tables */
     modalCreateElementActiveToggleM (state) {
       state.isModalElementPlanActive = !state.isModalElementPlanActive
-      console.log('modalCreateElementActiveToggleM' + state.isModalElementPlanActive)
+    },
+
+    modalUpdateElementActiveToggleM (state) {
+      state.isModalElementPlanActiveUpdate = !state.isModalElementPlanActiveUpdate
     },
 
     modalCreateElementActiveToggleErrorsM (state) {
       state.isModalElementPlanActiveErrors = !state.isModalElementPlanActiveErrors
-      console.log('isModalElementPlanActiveErrors' + state.isModalElementPlanActiveErrors)
+    },
+
+    modalCreateElementActiveToggleErrorsFalseM (state) {
+      state.isModalElementPlanActiveErrors = true
     },
 
     modalDeleteElementActiveToggleM (state) {
       state.isModalDeleteElementActive = !state.isModalDeleteElementActive
-      console.log('modalDeleteElementActiveToggleM' + state.isModalDeleteElementActive)
+    },
+    setErrors (state, error) {
+      state.errors = error
     }
   },
   getters: {
     getModalCreateElementActive: state => state.isModalElementPlanActive,
+    getModalUpdateElementActive: state => state.isModalElementPlanActiveUpdate,
     getModalCreateElementActiveErrors: state => state.isModalElementPlanActiveErrors,
     getModalDeleteElementActive: state => state.isModalDeleteElementActive,
-    getSelectedDevices: state => state.deviceSelect
+    getSelectedDevices: state => state.deviceSelect,
+    getErrors: state => state.errors
   },
   actions: {
+    cleanErrors ({ commit }) {
+      commit('setErrors', 'none')
+    },
     setStyle ({ commit, dispatch }, payload) {
       const style = styles[payload] ?? styles.basic
 
@@ -179,8 +195,15 @@ export default new Vuex.Store({
       commit('modalCreateElementActiveToggleM')
     },
 
+    modalUpdateElementActiveToggle ({ commit }) {
+      commit('modalUpdateElementActiveToggleM')
+    },
+
     modalCreateElementActiveToggleErrors ({ commit }) {
       commit('modalCreateElementActiveToggleErrorsM')
+    },
+    modalCreateElementActiveToggleErrorsFalse ({ commit }) {
+      commit('modalCreateElementActiveToggleErrorsFalseM')
     },
 
     modalDeleteElementActiveToggle ({ commit }) {

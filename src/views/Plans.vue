@@ -22,6 +22,8 @@ const plans = computed(() => store.getters.getPlansByType(type.value))
 
 const plansUpdateFields = computed(() => store.getters.getPlanUpdateFieldsState)
 
+const planErrors = computed(() => store.getters.getErrors)
+
 const titleStack = ref(['Admin', 'Tables'])
 
 const modalCreateElementActiveT = (plan) => {
@@ -32,25 +34,38 @@ const modalDeleteElementActiveT = () => {
   store.dispatch('modalDeleteElementActiveToggle')
 }
 
-const modalCreatePlan = (plan) => {
-  console.log('modalCreatePlan')
-  // eslint-disable-next-line no-constant-condition
-  if (true) {
+const handleErrors = () => {
+  const errors = computed(() => store.getters.getErrors)
+  if (errors.value !== 'none') {
     alert.value.showAlert(
       'error',
-      'modalCreatePlan'
+      planErrors.value
     )
-    store.dispatch('modalCreateElementActiveToggleErrors')
+    store.dispatch('modalCreateElementActiveToggleErrorsFalse')
   }
-  store.dispatch('addPlan', plan)
 }
 
-const modalEditPlan = (plan) => {
-  store.dispatch('updatePlan', plan)
+const modalCreatePlan = (plan, errorsHandler) => {
+  console.log('crate~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~``')
+  store.dispatch('addPlan', plan).then(() => {
+    handleErrors()
+    errorsHandler()
+  })
+  console.log('end of modal crate4354354389574389564389756438975643987')
 }
 
-const modalDeletePlan = (selection) => {
-  store.dispatch('deletePlan', selection)
+const modalEditPlan = (plan, errorsHandler) => {
+  store.dispatch('updatePlan', plan).then(() => {
+    handleErrors()
+    errorsHandler()
+  })
+}
+
+const modalDeletePlan = (selection, errorsHandler) => {
+  store.dispatch('deletePlan', selection).then(() => {
+    handleErrors()
+    errorsHandler()
+  })
 }
 
 const modalDeleteTimeItem = (selection, index) => {
@@ -135,6 +150,19 @@ const setAllButOneToFalse = (modelValue) => {
 
 const show = false
 
+const restartPLanExecution = (selectionId) => {
+  const typeOfPlan = store.getters.getPlanType
+  const plan = store.getters.getPlansByName(selectionId)
+  const el = typeOfPlan.at(0)
+  const payload = { plan_: plan, type_: el }
+  store.dispatch('restartPLanExecution', payload)
+}
+
+const stopPLanExecution = (selectionId) => {
+  console.log('restartPLanExecution')
+  store.dispatch('stopPlan', selectionId)
+}
+
 </script>
 
 <template>
@@ -197,6 +225,8 @@ const show = false
         @delete_item="modalDeleteTimeItem"
         @delete_item_new="modalDeleteTimeItem"
         @radio_elements="setAllButOneToFalse"
+        @restart_operation="restartPLanExecution"
+        @restart_operation_on_run="stopPLanExecution"
       />
     </card-component>
   </main-section>
