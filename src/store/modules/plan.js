@@ -165,8 +165,9 @@ const getters = {
   getPlansByName: (state) => (name) => {
     return state.plans[state.planType].find((d) => d.name === name)
   },
-  getPlansByType: (state) => (type) => {
-    return state.plans[type]
+  getPlansByTypeAndDeviceId: (state, getters, rootState, rootGetters) => (type) => {
+    const currentDevice = rootGetters.getCurrentDevice
+    return state.plans[type].filter(p => p.devices[0].device_id === currentDevice.device_id)
   },
   getClickButtonCompareValue: (state) => {
     if (state.planUpdateFieldsState === undefined || state.planUpdateFieldsState.length === 0) {

@@ -18,7 +18,7 @@ const store = useStore()
 
 const alert = ref(null)
 
-const plans = computed(() => store.getters.getPlansByType(type.value))
+const plans = computed(() => store.getters.getPlansByTypeAndDeviceId(type.value))
 
 const plansUpdateFields = computed(() => store.getters.getPlanUpdateFieldsState)
 
