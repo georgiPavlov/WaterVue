@@ -145,18 +145,6 @@ const state = {
   ]
 }
 
-// eslint-disable-next-line no-unused-vars
-const tokenType = 'Bearer '
-// eslint-disable-next-line no-unused-vars
-const token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6Im5ld191c2VyOSIsImV4cCI6MTAxNjU2NTI2NTQ2LCJlbWFpbCI6Im5ld191c2VyOEBtYWlsLmNvbSJ9.PzVPknqnwPh1yLjA2Xru8B1x-V2eiscrsKYQOtIi8VM'
-// eslint-disable-next-line no-unused-vars
-const baseURL = 'http://127.0.0.1:8080'
-const options = {
-  headers: {
-    Authorization: tokenType.concat(token)
-  }
-}
-
 const getters = {
   allPlans: state => state.plans,
   getPlanType: state => state.planType,
@@ -186,7 +174,9 @@ const getters = {
 }
 
 const actions = {
-  async restartPLanExecution ({ commit }, payload) {
+  async restartPLanExecution ({ dispatch, commit, getters, rootGetters }, payload) {
+    const baseURL = rootGetters.getBaseUrl
+    const options = rootGetters.getOptions
     const plan = payload.plan_
     const type = payload.type_
     const planCopy = { ...plan }
@@ -208,7 +198,9 @@ const actions = {
     )
     commit('updatePlan', plan)
   },
-  async updatePlan ({ commit }, plan) {
+  async updatePlan ({ dispatch, commit, getters, rootGetters }, plan) {
+    const baseURL = rootGetters.getBaseUrl
+    const options = rootGetters.getOptions
     const planCopy = { ...plan }
     delete planCopy.is_running
     delete planCopy.devices
@@ -229,7 +221,9 @@ const actions = {
     commit('updatePlan', plan)
   },
 
-  async stopPlan ({ commit, getters }, idName) {
+  async stopPlan ({ dispatch, commit, getters, rootGetters }, idName) {
+    const baseURL = rootGetters.getBaseUrl
+    const options = rootGetters.getOptions
     const deletePlanCopy = { ...state.deletePlan }
     deletePlanCopy.plan_to_stop = idName
     await axios.post(
@@ -243,7 +237,9 @@ const actions = {
     )
   },
 
-  async deletePlan ({ commit, getters }, idName) {
+  async deletePlan ({ dispatch, commit, getters, rootGetters }, idName) {
+    const baseURL = rootGetters.getBaseUrl
+    const options = rootGetters.getOptions
     const plan = getters.getPlansByName(idName)
     if (plan.plan_type === 'moisture' || plan.plan_type === 'time_based') {
       if (plan.is_running) {
@@ -278,7 +274,9 @@ const actions = {
   async initCurrentPlans ({ commit }, plans) {
     commit('minitCurrentPlans', plans)
   },
-  async fetchPlans ({ commit }) {
+  async fetchPlans ({ dispatch, commit, getters, rootGetters }) {
+    const baseURL = rootGetters.getBaseUrl
+    const options = rootGetters.getOptions
     const response = await axios.get(
       baseURL.concat('/gadget_communicator_pull/api/list_plans'), options)
       .catch(error => {
@@ -287,7 +285,9 @@ const actions = {
       })
     commit('setPlans', response.data)
   },
-  async addPlan ({ commit, getters }, p) {
+  async addPlan ({ dispatch, commit, getters, rootGetters }, p) {
+    const baseURL = rootGetters.getBaseUrl
+    const options = rootGetters.getOptions
     const dd = getters.getDevice
     const deviceId = dd.device_id
     const planCopy = { ...p }

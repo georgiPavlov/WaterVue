@@ -57,6 +57,28 @@ const routes = [
   },
   {
     meta: {
+      title: 'Status Logs'
+    },
+    path: '/status',
+    name: 'status',
+    // route level code-splitting
+    // this generates a separate chunk (about.[hash].js) for this route
+    // which is lazy-loaded when the route is visited.
+    component: () => import(/* webpackChunkName: "tables" */ '@/views/Status.vue')
+  },
+  {
+    meta: {
+      title: 'Photos'
+    },
+    path: '/photos',
+    name: 'photos',
+    // route level code-splitting
+    // this generates a separate chunk (about.[hash].js) for this route
+    // which is lazy-loaded when the route is visited.
+    component: () => import(/* webpackChunkName: "tables" */ '@/views/Photos.vue')
+  },
+  {
+    meta: {
       title: 'Forms'
     },
     path: '/forms',

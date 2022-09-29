@@ -58,14 +58,6 @@ const getters = {
   getDeviceUpdateFieldsState: state => state.deviceUpdateFieldsState
 }
 
-const tokenType = 'Bearer '
-const token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6Im5ld191c2VyOSIsImV4cCI6MTAxNjU2NTI2NTQ2LCJlbWFpbCI6Im5ld191c2VyOEBtYWlsLmNvbSJ9.PzVPknqnwPh1yLjA2Xru8B1x-V2eiscrsKYQOtIi8VM'
-const baseURL = 'http://127.0.0.1:8080'
-const options = {
-  headers: {
-    Authorization: tokenType.concat(token)
-  }
-}
 const actions = {
   async initCurrentDevice ({ commit }) {
     commit('mInitCurrentDeviceLabel')
@@ -73,7 +65,9 @@ const actions = {
   async setDeviceLabel ({ commit }, device) {
     commit('mSetDeviceSelect', device)
   },
-  async fetchDevices ({ commit }) {
+  async fetchDevices ({ dispatch, commit, getters, rootGetters }) {
+    const baseURL = rootGetters.getBaseUrl
+    const options = rootGetters.getOptions
     const response = await axios.get(
       baseURL.concat('/gadget_communicator_pull/api/list_devices'), options)
       .catch(
@@ -84,7 +78,9 @@ const actions = {
       )
     commit('setDevices', response.data)
   },
-  async addDevice ({ commit }, device) {
+  async addDevice ({ dispatch, commit, getters, rootGetters }, device) {
+    const baseURL = rootGetters.getBaseUrl
+    const options = rootGetters.getOptions
     const response = await axios.post(
       baseURL.concat('/gadget_communicator_pull/api/create_device'),
       device, options
@@ -97,7 +93,9 @@ const actions = {
 
     commit('newDevice', response.data)
   },
-  async deleteDevice ({ commit }, id) {
+  async deleteDevice ({ dispatch, commit, getters, rootGetters }, id) {
+    const baseURL = rootGetters.getBaseUrl
+    const options = rootGetters.getOptions
     const url = baseURL.concat('/gadget_communicator_pull/api/delete_device/').concat(id)
     await axios.delete(url, options).catch(
       function (error) {
@@ -107,19 +105,9 @@ const actions = {
     )
     commit('removeDevice', id)
   },
-  async filterDevices ({ commit }, e) {
-    // Get selected number
-    const limit = parseInt(
-      e.target.options[e.target.options.selectedIndex].innerText
-    )
-
-    const response = await axios.get(
-      `https://jsonplaceholder.typicode.com/devices?_limit=${limit}`
-    )
-
-    commit('setDevices', response.data)
-  },
-  async updateDevice ({ commit }, updDevice) {
+  async updateDevice ({ dispatch, commit, getters, rootGetters }, updDevice) {
+    const baseURL = rootGetters.getBaseUrl
+    const options = rootGetters.getOptions
     const deviceCopy = { ...updDevice }
     delete deviceCopy.water_level
     delete deviceCopy.moisture_level
@@ -134,7 +122,9 @@ const actions = {
     )
     commit('updateDevice', updDevice)
   },
-  async fetchDeviceWaterCharts ({ commit }, id) {
+  async fetchDeviceWaterCharts ({ dispatch, commit, getters, rootGetters }, id) {
+    const baseURL = rootGetters.getBaseUrl
+    const options = rootGetters.getOptions
     const url = baseURL.concat('/gadget_communicator_pull/api/list_device_charts/').concat(id)
     const response = await axios.get(url, options)
       .catch(

@@ -40,6 +40,16 @@ export default [
       icon: mdiTable
     },
     {
+      to: '/status',
+      label: 'StatusLogs',
+      icon: mdiTable
+    },
+    {
+      to: '/photos',
+      label: 'Photos',
+      icon: mdiTable
+    },
+    {
       to: '/forms',
       label: 'Forms',
       icon: mdiSquareEditOutline

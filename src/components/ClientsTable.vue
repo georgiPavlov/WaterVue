@@ -1,7 +1,7 @@
 <script setup>
 import { computed, onBeforeMount, reactive, ref, toRaw, toRef, watch } from 'vue'
 import { useStore } from 'vuex'
-import { mdiEye, mdiTrashCan, mdiRestart, mdiRayVertex } from '@mdi/js'
+import { mdiEye, mdiTrashCan, mdiRestart, mdiRayVertex, mdiFileDownload } from '@mdi/js'
 import ModalBox from '@/components/ModalBox.vue'
 import CheckboxCell from '@/components/CheckboxCell.vue'
 import Level from '@/components/Level.vue'
@@ -54,6 +54,14 @@ const props = defineProps({
   limitNumber: {
     type: Number,
     default: 100
+  },
+  showInfo: {
+    type: Boolean,
+    default: true
+  },
+  showDownloads: {
+    type: Boolean,
+    default: false
   }
 })
 
@@ -181,6 +189,12 @@ const confirmClickBulk = (mode, errorsHandler) => {
   })
 }
 
+const sendEmitDownload = (mode, row) => {
+  selection.value = getValueByKey(props.idName, row)
+  convertToReactive(row)
+  emit(mode, selection.value)
+}
+
 const emit = defineEmits(['delete', 'edit', 'create', 'delete_item', 'create_item', 'radio_elements'])
 const clickEmitDelete = (errorsHandler) => confirmClick('delete', errorsHandler)
 const clickEmitBulkDelete = (errorsHandler) => confirmClickBulk('delete', errorsHandler)
@@ -194,6 +208,7 @@ const clickEmitDeleteItemNew = (index) => confirmClickItemNew('delete_item_new',
 const clickEmitCreateItem = () => confirmClickItem('create_item')
 const clickEmitCreateItemCreateObject = () => confirmClickItemCreateObject('create_item_object_creator')
 
+const clickEmitDownload = (row) => sendEmitDownload('download', row)
 const sendEmitViewItemsStartEmit = (row) => sendEmitViewItemsStart(row, 'restart_operation')
 const sendRestartExecutionEmit = (row) => sendRestartExecution(row, 'restart_operation_on_run')
 
@@ -312,7 +327,7 @@ const createElement = computed(() => ['Create', ' ', props.typeElement].join('')
 
 const editElement = computed(() => ['Edit', ' ', props.typeElement].join(''))
 
-const DeleteElement = computed(() => ['Do you confirm deletion of', ' ', props.typeElement, 's'].join(''))
+const DeleteElement = computed(() => ['Do you confirm deletion of', ' ', props.typeElement].join(''))
 
 const itemsElement = computed(() => ['', ' ', props.itemsBox].join(''))
 
@@ -654,7 +669,7 @@ const showItemsForNewItem = () => {
             <div v-else-if="item.type === 'checkbox'">
               <div v-if="getValueByKey(item.field, row) !== buttonCompareValue">
                 <jb-button
-                  color="light"
+                  color="danger"
                 />
               </div>
               <div v-else>
@@ -670,10 +685,18 @@ const showItemsForNewItem = () => {
               no-wrap
             >
               <jb-button
+                v-if="showInfo === true"
                 color="info"
                 :icon="mdiEye"
                 small
                 @click="sendEmitEdit(row)"
+              />
+              <jb-button
+                v-if="showDownloads === true"
+                color="info"
+                :icon="mdiFileDownload"
+                small
+                @click="clickEmitDownload(row)"
               />
               <jb-button
                 color="danger"

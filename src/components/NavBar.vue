@@ -71,6 +71,8 @@ const changeSelectedDevice = (deviceId) => {
   const selection = computed(() => store.getters.getDeviceById(deviceId))
   store.dispatch('setDeviceLabel', selection.value)
   store.dispatch('fetchDeviceWaterCharts', selection.value.device_id)
+  store.dispatch('fetchStatusList')
+  store.dispatch('fetchPhotosList')
 }
 
 </script>

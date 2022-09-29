@@ -10,8 +10,11 @@ import JbButtons from '@/components/JbButtons.vue'
 import JbButton from '@/components/JbButton.vue'
 import Divider from '@/components/Divider.vue'
 import { useStore } from 'vuex'
+import VueBasicAlert from 'vue-basic-alert'
 
 const store = useStore()
+
+const alert = ref(null)
 
 const devices = computed(() => store.getters.allDevices)
 
@@ -118,5 +121,9 @@ const update = ref(true)
       />
     </card-component>
   </main-section>
-
+  <vue-basic-alert
+    ref="alert"
+    :duration="500"
+    :close-in="2000"
+  />
 </template>

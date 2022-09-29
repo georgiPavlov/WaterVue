@@ -4,12 +4,22 @@ import { darkModeKey, styleKey } from '@/config.js'
 import * as styles from '@/styles.js'
 import device from './modules/device'
 import plan from './modules/plan'
+import statusPlan from './modules/statusPlan'
+import photo from './modules/photo'
 import createPersistedState from 'vuex-persistedstate'
 
 export default new Vuex.Store({
   errors: 'none',
   plugins: [createPersistedState()],
   state: {
+    tokenType: 'Bearer ',
+    token: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6Im5ld191c2VyOSIsImV4cCI6MTAxNjU2NTI2NTQ2LCJlbWFpbCI6Im5ld191c2VyOEBtYWlsLmNvbSJ9.PzVPknqnwPh1yLjA2Xru8B1x-V2eiscrsKYQOtIi8VM',
+    baseURL: 'http://127.0.0.1:8080',
+    options: {
+      headers: {
+        Authorization: 'none'
+      }
+    },
     /* Styles */
     lightBorderStyle: '',
     lightBgStyle: '',
@@ -115,6 +125,11 @@ export default new Vuex.Store({
     }
   },
   getters: {
+    getOptions: state => {
+      state.options.headers.Authorization = state.tokenType.concat(state.token)
+      return state.options
+    },
+    getBaseUrl: state => state.baseURL,
     getModalCreateElementActive: state => state.isModalElementPlanActive,
     getModalUpdateElementActive: state => state.isModalElementPlanActiveUpdate,
     getModalCreateElementActiveErrors: state => state.isModalElementPlanActiveErrors,
@@ -212,6 +227,8 @@ export default new Vuex.Store({
   },
   modules: {
     device,
-    plan
+    plan,
+    statusPlan,
+    photo
   }
 })

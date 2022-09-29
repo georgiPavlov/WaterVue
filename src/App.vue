@@ -18,6 +18,8 @@ store.commit('user', {
 onBeforeMount(() => {
   store.dispatch('fetchDevices')
   store.dispatch('fetchPlans')
+  store.dispatch('fetchStatusList')
+  store.dispatch('fetchPhotosList')
   store.dispatch('initCurrentDevice')
 })
 
