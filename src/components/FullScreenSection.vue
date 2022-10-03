@@ -16,6 +16,7 @@ const store = useStore()
 
 const darkMode = computed(() => store.state.darkMode)
 
+// eslint-disable-next-line no-unused-vars
 const colorClass = computed(() => {
   switch (props.bg) {
     case 'login':

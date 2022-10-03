@@ -6,14 +6,16 @@ import device from './modules/device'
 import plan from './modules/plan'
 import statusPlan from './modules/statusPlan'
 import photo from './modules/photo'
+import login from './modules/login'
 import createPersistedState from 'vuex-persistedstate'
 
 export default new Vuex.Store({
   errors: 'none',
+  isAuthenticated: false,
   plugins: [createPersistedState()],
   state: {
     tokenType: 'Bearer ',
-    token: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6Im5ld191c2VyOSIsImV4cCI6MTAxNjU2NTI2NTQ2LCJlbWFpbCI6Im5ld191c2VyOEBtYWlsLmNvbSJ9.PzVPknqnwPh1yLjA2Xru8B1x-V2eiscrsKYQOtIi8VM',
+    token: '',
     baseURL: 'http://127.0.0.1:8080',
     options: {
       headers: {
@@ -71,6 +73,9 @@ export default new Vuex.Store({
     isModalDeleteElementActive: false
   },
   mutations: {
+    setTokenM (state, token) {
+      state.token = token
+    },
     /* A fit-them-all commit */
     basic (state, payload) {
       state[payload.key] = payload.value
@@ -122,9 +127,15 @@ export default new Vuex.Store({
     },
     setErrors (state, error) {
       state.errors = error
+    },
+    setIsAuthenticatedM (state, option) {
+      state.isAuthenticated = option
     }
   },
   getters: {
+    getAuthenticated: state => {
+      return state.isAuthenticated
+    },
     getOptions: state => {
       state.options.headers.Authorization = state.tokenType.concat(state.token)
       return state.options
@@ -138,6 +149,9 @@ export default new Vuex.Store({
     getErrors: state => state.errors
   },
   actions: {
+    setToken ({ commit }, token) {
+      commit('setTokenM', token)
+    },
     cleanErrors ({ commit }) {
       commit('setErrors', 'none')
     },
@@ -223,12 +237,21 @@ export default new Vuex.Store({
 
     modalDeleteElementActiveToggle ({ commit }) {
       commit('modalDeleteElementActiveToggleM')
+    },
+    setIsAuthenticated ({ commit }, code) {
+      console.log('code: ', code)
+      if (code === 401) {
+        commit('setIsAuthenticatedM', false)
+      } else {
+        commit('setIsAuthenticatedM', true)
+      }
     }
   },
   modules: {
     device,
     plan,
     statusPlan,
-    photo
+    photo,
+    login
   }
 })

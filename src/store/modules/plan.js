@@ -187,15 +187,17 @@ const actions = {
     } else {
       planCopy.has_been_executed = false
     }
-    await axios.post(
+    const response = await axios.post(
       baseURL.concat('/gadget_communicator_pull/api/update_plan'),
       planCopy, options
     ).catch(
       function (error) {
+        dispatch('setIsAuthenticated', error.response.status)
         console.log('Show error notification!' + JSON.stringify(error.response.data))
         commit('setErrors', error.response.data)
       }
     )
+    dispatch('setIsAuthenticated', response.status)
     commit('updatePlan', plan)
   },
   async updatePlan ({ dispatch, commit, getters, rootGetters }, plan) {
@@ -209,15 +211,17 @@ const actions = {
         delete planCopy.execute_only_once
       }
     }
-    await axios.post(
+    const response = await axios.post(
       baseURL.concat('/gadget_communicator_pull/api/update_plan'),
       planCopy, options
     ).catch(
       function (error) {
+        dispatch('setIsAuthenticated', error.response.status)
         console.log('Show error notification!' + JSON.stringify(error.response.data))
         commit('setErrors', error.response.data)
       }
     )
+    dispatch('setIsAuthenticated', response.status)
     commit('updatePlan', plan)
   },
 
@@ -226,15 +230,17 @@ const actions = {
     const options = rootGetters.getOptions
     const deletePlanCopy = { ...state.deletePlan }
     deletePlanCopy.plan_to_stop = idName
-    await axios.post(
+    const response = await axios.post(
       baseURL.concat('/gadget_communicator_pull/api/update_plan'),
       deletePlanCopy, options
     ).catch(
       function (error) {
+        dispatch('setIsAuthenticated', error.response.status)
         console.log('Show error notification!' + JSON.stringify(error.response.data))
         commit('setErrors', error.response.data)
       }
     )
+    dispatch('setIsAuthenticated', response.status)
   },
 
   async deletePlan ({ dispatch, commit, getters, rootGetters }, idName) {
@@ -245,24 +251,28 @@ const actions = {
       if (plan.is_running) {
         const deletePlanCopy = { ...state.deletePlan }
         deletePlanCopy.plan_to_stop = idName
-        await axios.post(
+        const response = await axios.post(
           baseURL.concat('/gadget_communicator_pull/api/update_plan'),
           deletePlanCopy, options
         ).catch(
           function (error) {
+            dispatch('setIsAuthenticated', error.response.status)
             console.log('Show error notification!' + JSON.stringify(error.response.data))
             commit('setErrors', error.response.data)
           }
         )
+        dispatch('setIsAuthenticated', response.status)
       }
     }
     const url = baseURL.concat('/gadget_communicator_pull/api/delete_plan/').concat(idName)
-    await axios.delete(url, options).catch(
+    const response = await axios.delete(url, options).catch(
       function (error) {
+        dispatch('setIsAuthenticated', error.response.status)
         console.log('Show error notification!' + JSON.stringify(error.response.data))
         return Promise.reject(error)
       }
     )
+    dispatch('setIsAuthenticated', response.status)
     commit('removePlan', idName)
   },
   setButtonSettingsModel ({ commit }) {
@@ -280,9 +290,11 @@ const actions = {
     const response = await axios.get(
       baseURL.concat('/gadget_communicator_pull/api/list_plans'), options)
       .catch(error => {
+        dispatch('setIsAuthenticated', error.response.status)
         console.log('Show error notification!' + JSON.stringify(error.response.data))
         return Promise.reject(error)
       })
+    dispatch('setIsAuthenticated', response.status)
     commit('setPlans', response.data)
   },
   async addPlan ({ dispatch, commit, getters, rootGetters }, p) {
@@ -307,9 +319,11 @@ const actions = {
       baseURL.concat('/gadget_communicator_pull/api/create_plan'),
       planWithDeviceId, options
     ).catch(error => {
+      dispatch('setIsAuthenticated', error.response.status)
       console.log('Show error notification!' + JSON.stringify(error.response.data))
       commit('setErrors', error.response.data)
     })
+    dispatch('setIsAuthenticated', response.status)
     if (getters.getErrors === 'none') {
       commit('newPlan', response.data)
     }

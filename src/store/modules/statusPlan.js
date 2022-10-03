@@ -59,10 +59,12 @@ const actions = {
       baseURL.concat('/gadget_communicator_pull/api/list_status/').concat(device.device_id), options)
       .catch(
         function (error) {
+          dispatch('setIsAuthenticated', error.response.status)
           console.log('Show error notification!' + error.response.data)
           return Promise.reject(error)
         }
       )
+    dispatch('setIsAuthenticated', response.status)
     console.log(JSON.stringify(response.data))
     commit('setStatusList', response.data)
   },
@@ -70,12 +72,14 @@ const actions = {
     const baseURL = rootGetters.getBaseUrl
     const options = rootGetters.getOptions
     const url = baseURL.concat('/gadget_communicator_pull/api/delete_status/').concat(id)
-    await axios.delete(url, options).catch(
+    const response = await axios.delete(url, options).catch(
       function (error) {
+        dispatch('setIsAuthenticated', error.response.status)
         console.log('Show error notification!')
         commit('setErrors', error.response.data)
       }
     )
+    dispatch('setIsAuthenticated', response.status)
     commit('removeStatus', id)
   }
 }

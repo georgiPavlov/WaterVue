@@ -68,14 +68,18 @@ const actions = {
   async fetchDevices ({ dispatch, commit, getters, rootGetters }) {
     const baseURL = rootGetters.getBaseUrl
     const options = rootGetters.getOptions
+    console.log('options' + options.headers.Authorization)
     const response = await axios.get(
       baseURL.concat('/gadget_communicator_pull/api/list_devices'), options)
       .catch(
         function (error) {
+          dispatch('setIsAuthenticated', error.response.status)
           console.log('Show error notification!')
           return Promise.reject(error)
         }
       )
+    dispatch('setIsAuthenticated', response.status)
+    // dispatch('fetchDevices')
     commit('setDevices', response.data)
   },
   async addDevice ({ dispatch, commit, getters, rootGetters }, device) {
@@ -86,6 +90,7 @@ const actions = {
       device, options
     ).catch(
       function (error) {
+        dispatch('setIsAuthenticated', error.response.status)
         console.log('Show error notification!')
         commit('setErrors', error.response.data)
       }
@@ -99,6 +104,7 @@ const actions = {
     const url = baseURL.concat('/gadget_communicator_pull/api/delete_device/').concat(id)
     await axios.delete(url, options).catch(
       function (error) {
+        dispatch('setIsAuthenticated', error.response.status)
         console.log('Show error notification!')
         commit('setErrors', error.response.data)
       }
@@ -116,6 +122,7 @@ const actions = {
       deviceCopy, options
     ).catch(
       function (error) {
+        dispatch('setIsAuthenticated', error.response.status)
         console.log('Show error notification!')
         commit('setErrors', error.response.data)
       }
@@ -129,6 +136,7 @@ const actions = {
     const response = await axios.get(url, options)
       .catch(
         function (error) {
+          dispatch('setIsAuthenticated', error.response.status)
           console.log('Show error notification!')
           return Promise.reject(error)
         }

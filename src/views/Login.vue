@@ -1,26 +1,55 @@
 <script setup>
-import { reactive } from 'vue'
+import { reactive, computed, ref, onBeforeMount } from 'vue'
 import { useRouter } from 'vue-router'
 import { mdiAccount, mdiAsterisk } from '@mdi/js'
 import FullScreenSection from '@/components/FullScreenSection.vue'
 import CardComponent from '@/components/CardComponent.vue'
-import CheckRadioPicker from '@/components/CheckRadioPicker.vue'
 import Field from '@/components/Field.vue'
 import Control from '@/components/Control.vue'
 import Divider from '@/components/Divider.vue'
 import JbButton from '@/components/JbButton.vue'
 import JbButtons from '@/components/JbButtons.vue'
+import { useStore } from 'vuex'
+import VueBasicAlert from 'vue-basic-alert'
 
 const form = reactive({
-  login: 'john.doe',
-  pass: 'highly-secure-password-fYjUw-',
-  remember: ['remember']
+  username: '',
+  password: ''
 })
+
+const alert1 = ref(null)
 
 const router = useRouter()
 
+const store = useStore()
+
+const handleErrorsLocal = () => {
+  const errors = computed(() => store.getters.getErrors)
+  if (errors.value !== 'none') {
+    alert1.value.showAlert(
+      'error',
+      errors.value
+    )
+  }
+  store.dispatch('cleanErrors')
+}
+
+const isAuthenticated = computed(() => store.getters.getAuthenticated)
+
+onBeforeMount(() => {
+  if (isAuthenticated.value === true) {
+    router.push('/dashboard')
+  }
+})
+
 const submit = () => {
-  router.push('/dashboard')
+  console.log('test login' + JSON.stringify(form))
+  store.dispatch('login', form).then(() => {
+    handleErrorsLocal()
+    if (store.getters.getAuthenticated === true) {
+      router.push('/dashboard')
+    }
+  })
 }
 </script>
 
@@ -40,7 +69,7 @@ const submit = () => {
         help="Please enter your login"
       >
         <control
-          v-model="form.login"
+          v-model="form.username"
           :icon="mdiAccount"
           name="login"
           autocomplete="username"
@@ -52,19 +81,13 @@ const submit = () => {
         help="Please enter your password"
       >
         <control
-          v-model="form.pass"
+          v-model="form.password"
           :icon="mdiAsterisk"
           type="password"
           name="password"
           autocomplete="current-password"
         />
       </field>
-
-      <check-radio-picker
-        v-model="form.remember"
-        name="remember"
-        :options="{ remember: 'Remember' }"
-      />
 
       <divider />
 
@@ -78,9 +101,14 @@ const submit = () => {
           to="/dashboard"
           color="info"
           outline
-          label="Back"
+          label="Register"
         />
       </jb-buttons>
     </card-component>
   </full-screen-section>
+  <vue-basic-alert
+    ref="alert1"
+    :duration="500"
+    :close-in="2000"
+  />
 </template>

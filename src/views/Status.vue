@@ -26,22 +26,26 @@ const modalDeleteElementActiveT = () => {
   store.dispatch('modalDeleteElementActiveToggle')
 }
 
-const handleErrors = () => {
+const handleErrorsLocal = (message) => {
   const errors = computed(() => store.getters.getErrors)
   if (errors.value !== 'none') {
     alert.value.showAlert(
       'error',
       errors.value
     )
-    store.dispatch('modalCreateElementActiveToggleErrorsFalse')
+  } else {
+    alert.value.showAlert(
+      'success',
+      message
+    )
   }
+  store.dispatch('cleanErrors')
 }
 
 const modalDeleteStatus = (selection, errorsHandler) => {
   console.log('test status' + selection)
   store.dispatch('deleteStatus', selection).then(() => {
-    handleErrors()
-    errorsHandler()
+    handleErrorsLocal('Error deleting message')
   })
 }
 

@@ -43,10 +43,14 @@ const actions = {
       baseURL.concat('/gadget_communicator_pull/api/list_photos/device/').concat(device.device_id), options)
       .catch(
         function (error) {
+          if (error.response.status === 401) {
+            dispatch('setIsAuthenticated', error.response.status)
+          }
           console.log('Show error notification!' + error.response.data)
           return Promise.reject(error)
         }
       )
+    dispatch('setIsAuthenticated', response.status)
     console.log(JSON.stringify(response.data))
     commit('setPhotosList', response.data)
   },
@@ -54,12 +58,14 @@ const actions = {
     const baseURL = rootGetters.getBaseUrl
     const options = rootGetters.getOptions
     const url = baseURL.concat('/gadget_communicator_pull/api/photo_operation/').concat(id).concat('/delete')
-    await axios.delete(url, options).catch(
+    const response = await axios.delete(url, options).catch(
       function (error) {
+        dispatch('setIsAuthenticated', error.response.status)
         console.log('Show error notification!')
         commit('setErrors', error.response.data)
       }
     )
+    dispatch('setIsAuthenticated', response.status)
     commit('removePhoto', id)
   },
   async takePhoto ({ dispatch, commit, getters, rootGetters }) {
@@ -69,6 +75,7 @@ const actions = {
     const url = baseURL.concat('/gadget_communicator_pull/api/photo_operation/device/').concat(device.device_id)
     const responseCreate = await axios.get(url, options).catch(
       function (error) {
+        dispatch('setIsAuthenticated', error.response.status)
         console.log('Show error notification!')
         commit('setErrors', error.response.data)
       }
@@ -76,10 +83,12 @@ const actions = {
     const urlGet = baseURL.concat('/gadget_communicator_pull/api/photo_operation/').concat(responseCreate.data.id)
     const response = await axios.get(urlGet, options).catch(
       function (error) {
+        dispatch('setIsAuthenticated', error.response.status)
         console.log('Show error notification!')
         return Promise.reject(error)
       }
     )
+    dispatch('setIsAuthenticated', response.status)
     commit('takePhotoM', response.data)
   },
   async downloadPhoto ({ dispatch, commit, getters, rootGetters }, id) {
@@ -90,6 +99,7 @@ const actions = {
     optionsCopy.responseType = 'arraybuffer'
     const url = baseURL.concat('/gadget_communicator_pull/api/photo_operation/').concat(id).concat('/download')
     await axios.get(url, optionsCopy).then((response) => {
+      dispatch('setIsAuthenticated', response.status)
       const url = window.URL.createObjectURL(new Blob([response.data], { type: 'image/png' }))
       const link = document.createElement('a')
       link.href = url
@@ -101,6 +111,7 @@ const actions = {
       async function (error) {
         await axios.get(url, options).catch(
           function (error) {
+            dispatch('setIsAuthenticated', error.response.status)
             console.log('Show error notification!' + JSON.stringify(error.response.data))
             err = JSON.stringify(error.response.data)
           }).then(() => {

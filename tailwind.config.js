@@ -33,6 +33,9 @@ module.exports = {
       animation: {
         fadeOut: 'fadeOut 250ms ease-in-out',
         fadeIn: 'fadeIn 250ms ease-in-out'
+      },
+      backgroundImage: {
+        'login-image': "url('img/Untitled-Artwork.png')"
       }
     }
   },

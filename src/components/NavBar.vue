@@ -19,8 +19,11 @@ import NavBarItemLabel from '@/components/NavBarItemLabel.vue'
 import NavBarMenu from '@/components/NavBarMenu.vue'
 import Divider from '@/components/Divider.vue'
 import Icon from '@/components/Icon.vue'
+import { useRouter } from 'vue-router'
 
 const store = useStore()
+
+const router = useRouter()
 
 const lightBorderStyle = computed(() => store.state.lightBorderStyle)
 
@@ -73,6 +76,13 @@ const changeSelectedDevice = (deviceId) => {
   store.dispatch('fetchDeviceWaterCharts', selection.value.device_id)
   store.dispatch('fetchStatusList')
   store.dispatch('fetchPhotosList')
+}
+
+const logOut = () => {
+  store.dispatch('setToken', '')
+  store.dispatch('setIsAuthenticated', 401)
+  console.log('out')
+  router.push('/login')
 }
 
 </script>
@@ -169,6 +179,7 @@ const changeSelectedDevice = (deviceId) => {
               <nav-bar-item-label
                 :icon="mdiLogout"
                 label="Log Out"
+                @click="test"
               />
             </nav-bar-item>
           </template>
@@ -184,7 +195,10 @@ const changeSelectedDevice = (deviceId) => {
             is-desktop-icon-only
           />
         </nav-bar-item>
-        <nav-bar-item is-desktop-icon-only>
+        <nav-bar-item
+          is-desktop-icon-only
+          @click.prevent="logOut"
+        >
           <nav-bar-item-label
             :icon="mdiLogout"
             label="Log out"
