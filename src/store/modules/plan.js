@@ -175,6 +175,7 @@ const getters = {
 
 const actions = {
   async restartPLanExecution ({ dispatch, commit, getters, rootGetters }, payload) {
+    dispatch('cleanErrors')
     const baseURL = rootGetters.getBaseUrl
     const options = rootGetters.getOptions
     const plan = payload.plan_
@@ -201,6 +202,7 @@ const actions = {
     commit('updatePlan', plan)
   },
   async updatePlan ({ dispatch, commit, getters, rootGetters }, plan) {
+    dispatch('cleanErrors')
     const baseURL = rootGetters.getBaseUrl
     const options = rootGetters.getOptions
     const planCopy = { ...plan }
@@ -226,6 +228,7 @@ const actions = {
   },
 
   async stopPlan ({ dispatch, commit, getters, rootGetters }, idName) {
+    dispatch('cleanErrors')
     const baseURL = rootGetters.getBaseUrl
     const options = rootGetters.getOptions
     const deletePlanCopy = { ...state.deletePlan }
@@ -244,6 +247,7 @@ const actions = {
   },
 
   async deletePlan ({ dispatch, commit, getters, rootGetters }, idName) {
+    dispatch('cleanErrors')
     const baseURL = rootGetters.getBaseUrl
     const options = rootGetters.getOptions
     const plan = getters.getPlansByName(idName)
@@ -285,6 +289,7 @@ const actions = {
     commit('minitCurrentPlans', plans)
   },
   async fetchPlans ({ dispatch, commit, getters, rootGetters }) {
+    dispatch('cleanErrors')
     const baseURL = rootGetters.getBaseUrl
     const options = rootGetters.getOptions
     const response = await axios.get(
@@ -298,6 +303,7 @@ const actions = {
     commit('setPlans', response.data)
   },
   async addPlan ({ dispatch, commit, getters, rootGetters }, p) {
+    dispatch('cleanErrors')
     const baseURL = rootGetters.getBaseUrl
     const options = rootGetters.getOptions
     const dd = getters.getDevice

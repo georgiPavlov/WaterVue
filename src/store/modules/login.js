@@ -2,8 +2,8 @@ import axios from 'axios'
 
 const state = {
   loginParams: {
-    username: 'new_user9',
-    password: 'new_pass9'
+    username: '',
+    password: ''
   }
 }
 
@@ -16,6 +16,7 @@ const actions = {
     commit('setLoginParamsM', params)
   },
   async login ({ dispatch, commit, getters, rootGetters }) {
+    dispatch('cleanErrors')
     const baseURL = rootGetters.getBaseUrl
     const options = { headers: { 'content-type': 'application/json' } }
     const isAuthenticated = rootGetters.getAuthenticated

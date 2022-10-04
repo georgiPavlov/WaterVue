@@ -44,7 +44,8 @@ onBeforeMount(() => {
 
 const submit = () => {
   console.log('test login' + JSON.stringify(form))
-  store.dispatch('login', form).then(() => {
+  store.dispatch('setLoginParams', form)
+  store.dispatch('login').then(() => {
     handleErrorsLocal()
     if (store.getters.getAuthenticated === true) {
       router.push('/dashboard')

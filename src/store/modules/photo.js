@@ -35,6 +35,7 @@ const getters = {
 
 const actions = {
   async fetchPhotosList ({ dispatch, commit, getters, rootGetters }) {
+    dispatch('cleanErrors')
     const baseURL = rootGetters.getBaseUrl
     const options = rootGetters.getOptions
     console.log('in fetch photos')
@@ -55,6 +56,7 @@ const actions = {
     commit('setPhotosList', response.data)
   },
   async deletePhoto ({ dispatch, commit, getters, rootGetters }, id) {
+    dispatch('cleanErrors')
     const baseURL = rootGetters.getBaseUrl
     const options = rootGetters.getOptions
     const url = baseURL.concat('/gadget_communicator_pull/api/photo_operation/').concat(id).concat('/delete')
@@ -69,6 +71,7 @@ const actions = {
     commit('removePhoto', id)
   },
   async takePhoto ({ dispatch, commit, getters, rootGetters }) {
+    dispatch('cleanErrors')
     const baseURL = rootGetters.getBaseUrl
     const options = rootGetters.getOptions
     const device = getters.getDeviceForPhoto
@@ -92,6 +95,7 @@ const actions = {
     commit('takePhotoM', response.data)
   },
   async downloadPhoto ({ dispatch, commit, getters, rootGetters }, id) {
+    dispatch('cleanErrors')
     const baseURL = rootGetters.getBaseUrl
     const options = rootGetters.getOptions
     const optionsCopy = { ...options }

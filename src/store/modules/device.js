@@ -66,6 +66,7 @@ const actions = {
     commit('mSetDeviceSelect', device)
   },
   async fetchDevices ({ dispatch, commit, getters, rootGetters }) {
+    dispatch('cleanErrors')
     const baseURL = rootGetters.getBaseUrl
     const options = rootGetters.getOptions
     console.log('options' + options.headers.Authorization)
@@ -83,6 +84,7 @@ const actions = {
     commit('setDevices', response.data)
   },
   async addDevice ({ dispatch, commit, getters, rootGetters }, device) {
+    dispatch('cleanErrors')
     const baseURL = rootGetters.getBaseUrl
     const options = rootGetters.getOptions
     const response = await axios.post(
@@ -99,6 +101,7 @@ const actions = {
     commit('newDevice', response.data)
   },
   async deleteDevice ({ dispatch, commit, getters, rootGetters }, id) {
+    dispatch('cleanErrors')
     const baseURL = rootGetters.getBaseUrl
     const options = rootGetters.getOptions
     const url = baseURL.concat('/gadget_communicator_pull/api/delete_device/').concat(id)
@@ -112,6 +115,7 @@ const actions = {
     commit('removeDevice', id)
   },
   async updateDevice ({ dispatch, commit, getters, rootGetters }, updDevice) {
+    dispatch('cleanErrors')
     const baseURL = rootGetters.getBaseUrl
     const options = rootGetters.getOptions
     const deviceCopy = { ...updDevice }
@@ -130,6 +134,7 @@ const actions = {
     commit('updateDevice', updDevice)
   },
   async fetchDeviceWaterCharts ({ dispatch, commit, getters, rootGetters }, id) {
+    dispatch('cleanErrors')
     const baseURL = rootGetters.getBaseUrl
     const options = rootGetters.getOptions
     const url = baseURL.concat('/gadget_communicator_pull/api/list_device_charts/').concat(id)

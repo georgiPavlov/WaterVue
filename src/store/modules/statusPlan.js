@@ -51,6 +51,7 @@ const getters = {
 
 const actions = {
   async fetchStatusList ({ dispatch, commit, getters, rootGetters }) {
+    dispatch('cleanErrors')
     const baseURL = rootGetters.getBaseUrl
     const options = rootGetters.getOptions
     console.log('in fetch')
@@ -69,6 +70,7 @@ const actions = {
     commit('setStatusList', response.data)
   },
   async deleteStatus ({ dispatch, commit, getters, rootGetters }, id) {
+    dispatch('cleanErrors')
     const baseURL = rootGetters.getBaseUrl
     const options = rootGetters.getOptions
     const url = baseURL.concat('/gadget_communicator_pull/api/delete_status/').concat(id)
