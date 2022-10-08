@@ -18,6 +18,10 @@ defineProps({
     type: String,
     default: null
   },
+  defaultBehaviour: {
+    type: Boolean,
+    default: true
+  },
   prefix: {
     type: String,
     default: null
@@ -41,6 +45,14 @@ defineProps({
   trendType: {
     type: String,
     default: null
+  },
+  formatHeight: {
+    type: Number,
+    default: 170
+  },
+  formatWidth: {
+    type: Number,
+    default: 170
   }
 })
 
@@ -85,6 +97,9 @@ const darkMode = computed(() => store.state.darkMode)
       </div>
       <icon
         v-if="icon"
+        :default-behaviour="defaultBehaviour"
+        :format-height="formatHeight"
+        :format-width="formatWidth"
         :path="icon"
         size="100"
         w=""
