@@ -2,9 +2,6 @@
 import { computed, ref, onMounted } from 'vue'
 import { useStore } from 'vuex'
 import {
-  mdiAccountMultiple,
-  mdiCartOutline,
-  mdiChartTimelineVariant,
   mdiFinance,
   mdiReload,
   mdiChartPie
@@ -53,45 +50,63 @@ const selectedDevice = computed(() => store.getters.getCurrentDevice)
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:h-100 mb-6">
       <card-widget
         color="text-emerald-500"
-        :icon="mdiAccountMultiple"
         :prefix="selectedDevice.label"
         label="Device"
         :number="-1"
+        default-behaviour="false"
+        icon="device-name"
+        format-height="130"
+        format-width="100"
       />
       <card-widget
         color="text-emerald-500"
-        :icon="mdiAccountMultiple"
         :number="selectedDevice.water_container_capacity"
         suffix="ml"
         label="Water container capacity"
+        default-behaviour="false"
+        icon="capacity-final"
+        format-height="140"
+        format-width="140"
       />
       <card-widget
         color="text-blue-500"
-        :icon="mdiCartOutline"
         :number="selectedDevice.water_level"
         suffix="%"
         label="Water"
+        default-behaviour="false"
+        icon="water"
+        format-height="100"
+        format-width="100"
       />
       <card-widget
         color="text-red-500"
-        :icon="mdiChartTimelineVariant"
         :number="selectedDevice.moisture_level"
         suffix="%"
         label="Moisture"
+        default-behaviour="false"
+        icon="moisture"
+        format-height="100"
+        format-width="100"
       />
       <card-widget
         color="text-emerald-500"
-        :icon="mdiAccountMultiple"
         prefix="Success"
         label="Status"
         :number="-1"
+        default-behaviour="false"
+        icon="status"
+        format-height="100"
+        format-width="100"
       />
       <card-widget
         color="text-emerald-500"
-        :icon="mdiAccountMultiple"
         prefix="time plan 123"
         label="Running plan"
         :number="-1"
+        default-behaviour="false"
+        icon="plan"
+        format-height="90"
+        format-width="90"
       />
     </div>
 
