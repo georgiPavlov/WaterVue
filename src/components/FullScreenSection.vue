@@ -1,7 +1,7 @@
 <script setup>
 import { computed } from 'vue'
 import { useStore } from 'vuex'
-import { sectionBgLogin, sectionBgLoginDark, sectionBgError, sectionBgErrorDark } from '@/colors'
+import { sectionBgLogin, sectionBgError } from '@/colors'
 import MainSection from '@/components/MainSection.vue'
 
 const props = defineProps({
@@ -14,15 +14,16 @@ const props = defineProps({
 
 const store = useStore()
 
+// eslint-disable-next-line no-unused-vars
 const darkMode = computed(() => store.state.darkMode)
 
 // eslint-disable-next-line no-unused-vars
 const colorClass = computed(() => {
   switch (props.bg) {
     case 'login':
-      return darkMode.value ? sectionBgLoginDark : sectionBgLogin
+      return sectionBgLogin
     case 'error':
-      return darkMode.value ? sectionBgErrorDark : sectionBgError
+      return sectionBgError
   }
 
   return ''

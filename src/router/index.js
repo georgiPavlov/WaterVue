@@ -120,6 +120,24 @@ const routes = [
   },
   {
     meta: {
+      title: 'Register',
+      fullScreen: true
+    },
+    path: '/register',
+    name: 'register',
+    component: () => import(/* webpackChunkName: "login" */ '@/views/Register.vue')
+  },
+  {
+    meta: {
+      title: 'Recover Password',
+      fullScreen: true
+    },
+    path: '/recover',
+    name: 'recover',
+    component: () => import(/* webpackChunkName: "login" */ '@/views/RecoverEmail.vue')
+  },
+  {
+    meta: {
       title: 'Error',
       fullScreen: true
     },

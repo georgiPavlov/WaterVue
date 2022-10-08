@@ -7,6 +7,9 @@ import plan from './modules/plan'
 import statusPlan from './modules/statusPlan'
 import photo from './modules/photo'
 import login from './modules/login'
+import register from './modules/register'
+import profile from './modules/profile'
+import forgottenPassword from './modules/forgottenPassword'
 import createPersistedState from 'vuex-persistedstate'
 
 export default new Vuex.Store({
@@ -238,9 +241,12 @@ export default new Vuex.Store({
     modalDeleteElementActiveToggle ({ commit }) {
       commit('modalDeleteElementActiveToggleM')
     },
-    setIsAuthenticated ({ commit }, code) {
+    async setIsAuthenticated ({ dispatch, commit, getters, rootGetters }, code) {
       console.log('code: ', code)
+      const isAuthenticated = rootGetters.getAuthenticated
       if (code === 401) {
+        commit('setIsAuthenticatedM', false)
+      } else if (code === 400 && isAuthenticated === false) {
         commit('setIsAuthenticatedM', false)
       } else {
         commit('setIsAuthenticatedM', true)
@@ -252,6 +258,9 @@ export default new Vuex.Store({
     plan,
     statusPlan,
     photo,
-    login
+    login,
+    register,
+    forgottenPassword,
+    profile
   }
 })

@@ -49,7 +49,6 @@ const submit = () => {
     handleErrorsLocal()
     if (store.getters.getAuthenticated === true) {
       router.push('/dashboard')
-      store.dispatch('initCurrentDevice')
       window.location.reload()
     }
   })
@@ -105,12 +104,6 @@ const submit = () => {
           color="info"
           outline
           label="Register"
-        />
-        <jb-button
-          to="/recover"
-          color="info"
-          outline
-          label="Forgotten Password"
         />
       </jb-buttons>
     </card-component>

@@ -8,7 +8,8 @@ const state = {
 }
 
 const getters = {
-  getLoginParams: state => state.loginParams
+  getLoginParams: state => state.loginParams,
+  getUsername_: state => state.loginParams.username
 }
 
 const actions = {

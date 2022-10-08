@@ -12,7 +12,7 @@ defineProps({
   },
   device_select: {
     type: String,
-    default: 'no device registered'
+    default: 'no device selected'
   },
   isDesktopIconOnly: Boolean,
   showDevice: {

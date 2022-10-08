@@ -18,6 +18,7 @@ import CardWidget from '@/components/CardWidget.vue'
 import CardComponent from '@/components/CardComponent.vue'
 import TitleSubBar from '@/components/TitleSubBar.vue'
 import CardWithButton from '@/components/CardWithButton'
+import JbButton from '@/components/JbButton.vue'
 
 const titleStack = ref(['Water System'])
 
@@ -138,5 +139,10 @@ const selectedDevice = computed(() => store.getters.getCurrentDevice)
   </main-section>
   <main-section v-if="devices.length === 0">
     <label class="block font-bold mb-2 bg-red-500">No device registered</label>
+    <jb-button
+      to="/devices"
+      color="success"
+      label="Add Device"
+    />
   </main-section>
 </template>

@@ -1,49 +1,111 @@
 <script setup>
-import { ref, reactive } from 'vue'
+import { ref, reactive, computed, onBeforeMount } from 'vue'
 import { useStore } from 'vuex'
-import { mdiAccount, mdiAccountCircle, mdiLock, mdiMail, mdiAsterisk, mdiFormTextboxPassword } from '@mdi/js'
+import * as module from '@mdi/js'
 import MainSection from '@/components/MainSection.vue'
 import CardComponent from '@/components/CardComponent.vue'
 import TitleBar from '@/components/TitleBar.vue'
 import Divider from '@/components/Divider.vue'
 import Field from '@/components/Field.vue'
 import Control from '@/components/Control.vue'
-import FilePicker from '@/components/FilePicker.vue'
 import JbButton from '@/components/JbButton.vue'
-import BottomOtherPagesSection from '@/components/BottomOtherPagesSection.vue'
 import JbButtons from '@/components/JbButtons.vue'
-import UserCard from '@/components/UserCard.vue'
+import Notification from '@/components/Notification.vue'
+import { useRouter } from 'vue-router'
+import VueBasicAlert from 'vue-basic-alert'
+
+const router = useRouter()
 
 const store = useStore()
 
-const titleStack = ref(['Admin', 'Profile'])
+const alert = ref(null)
 
-const profileForm = reactive({
-  name: store.state.userName,
-  email: store.state.userEmail
+const form = reactive({})
+
+const formPassword = reactive({})
+
+const isAuthenticated = computed(() => store.getters.getAuthenticated)
+
+const getProfileFields = computed(() => store.getters.getProfileFields)
+
+const getProfileParams = computed(() => store.getters.getProfileParams)
+
+// eslint-disable-next-line no-unused-vars
+const getChangePasswordFields = computed(() => store.getters.getChangePasswordFields)
+
+onBeforeMount(() => {
+  if (isAuthenticated.value !== true) {
+    router.push('/profile')
+  }
+  store.dispatch('profileUpdateGet').then(() => {
+    copyValuesToForm(getProfileFields, getProfileParams, form, false)
+    copyValuesToForm(getChangePasswordFields, passwordFormEmpty, formPassword, true)
+  })
 })
 
-const passwordForm = reactive({
+const copyValuesToForm = (fields_, params_, form_, reactive) => {
+  const fields = fields_.value
+  for (const f in fields) {
+    const field = fields[f].field
+    if (reactive === true) {
+      form_[field] = params_[field]
+    } else {
+      form_[field] = params_.value[field]
+    }
+  }
+}
+const titleStack = ref(['Admin', 'Profile'])
+
+const passwordFormEmpty = reactive({
   password_current: '',
   password: '',
   password_confirmation: ''
 })
 
+const handleErrorsLocal = (message) => {
+  const errors = computed(() => store.getters.getErrors)
+  if (errors.value !== 'none') {
+    alert.value.showAlert(
+      'error',
+      errors.value
+    )
+  } else {
+    alert.value.showAlert(
+      'success',
+      message
+    )
+  }
+  store.dispatch('cleanErrors')
+}
+
 const submitProfile = () => {
-  store.commit('user', profileForm)
+  form.password = formPassword.password
+  console.log('test register' + JSON.stringify(form))
+  store.dispatch('profileUpdate', form).then(() => {
+    handleErrorsLocal('successfully updated profile')
+  })
+  copyValuesToForm(getChangePasswordFields, passwordFormEmpty, formPassword, true)
 }
 
 const submitPass = () => {
-  //
+  console.log('test register' + JSON.stringify(form))
+  store.dispatch('profileUpdatePass', formPassword).then(() => {
+    handleErrorsLocal('successfully updated profile password')
+  })
+  copyValuesToForm(getChangePasswordFields, passwordFormEmpty, formPassword, true)
 }
 </script>
 
 <template>
   <title-bar :title-stack="titleStack" />
-
-  <user-card />
-
   <main-section>
+    <notification
+      color="warning"
+      :icon="mdiFeather"
+      :outline="notificationsOutline"
+    >
+      <b>Important. 'Current password'</b> must be entered in order to update profile fields
+    </notification>
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <card-component
         title="Edit Profile"
@@ -52,38 +114,32 @@ const submitPass = () => {
         @submit.prevent="submitProfile"
       >
         <field
-          label="Avatar"
-          help="Max 500kb"
+          v-for="(item, index) in getProfileFields"
+          :key="index"
+          :label="item.column"
+          :help="item.message"
         >
-          <file-picker />
-        </field>
+          <div
+            v-if="item.type === 'password'"
+          >
+            <control
+              v-model="form[item.field]"
+              :icon="module[item.icon]"
+              :name="item.column"
+              type="password"
+            />
+          </div>
+          <div
+            v-else
+          >
+            <control
+              v-model="form[item.field]"
+              :icon="module[item.icon]"
+              :name="item.column"
+            />
+          </div>
 
-        <field
-          label="Name"
-          help="Required. Your name"
-        >
-          <control
-            v-model="profileForm.name"
-            :icon="mdiAccount"
-            name="username"
-            required
-            autocomplete="username"
-          />
         </field>
-        <field
-          label="E-mail"
-          help="Required. Your e-mail"
-        >
-          <control
-            v-model="profileForm.email"
-            :icon="mdiMail"
-            type="email"
-            name="email"
-            required
-            autocomplete="email"
-          />
-        </field>
-
         <divider />
 
         <jb-buttons>
@@ -91,11 +147,6 @@ const submitPass = () => {
             color="info"
             type="submit"
             label="Submit"
-          />
-          <jb-button
-            color="info"
-            label="Options"
-            outline
           />
         </jb-buttons>
       </card-component>
@@ -107,47 +158,31 @@ const submitPass = () => {
         @submit.prevent="submitPass"
       >
         <field
-          label="Current password"
-          help="Required. Your current password"
+          v-for="(item, index) in getChangePasswordFields"
+          :key="index"
+          :label="item.column"
+          :help="item.message"
         >
-          <control
-            v-model="passwordForm.password_current"
-            :icon="mdiAsterisk"
-            name="password_current"
-            type="password"
-            required
-            autocomplete="current-password"
-          />
-        </field>
+          <div
+            v-if="item.type === 'password'"
+          >
+            <control
+              v-model="formPassword[item.field]"
+              :icon="module[item.icon]"
+              :name="item.column"
+              type="password"
+            />
+          </div>
+          <div
+            v-else
+          >
+            <control
+              v-model="formPassword[item.field]"
+              :icon="module[item.icon]"
+              :name="item.column"
+            />
+          </div>
 
-        <divider />
-
-        <field
-          label="New password"
-          help="Required. New password"
-        >
-          <control
-            v-model="passwordForm.password"
-            :icon="mdiFormTextboxPassword"
-            name="password"
-            type="password"
-            required
-            autocomplete="new-password"
-          />
-        </field>
-
-        <field
-          label="Confirm password"
-          help="Required. New password one more time"
-        >
-          <control
-            v-model="passwordForm.password_confirmation"
-            :icon="mdiFormTextboxPassword"
-            name="password_confirmation"
-            type="password"
-            required
-            autocomplete="new-password"
-          />
         </field>
 
         <divider />
@@ -167,6 +202,9 @@ const submitPass = () => {
       </card-component>
     </div>
   </main-section>
-
-  <bottom-other-pages-section />
+  <vue-basic-alert
+    ref="alert"
+    :duration="500"
+    :close-in="2000"
+  />
 </template>

@@ -1,7 +1,7 @@
 <script setup>
 import { reactive, computed, ref, onBeforeMount } from 'vue'
 import { useRouter } from 'vue-router'
-import { mdiAccount, mdiAsterisk } from '@mdi/js'
+import * as module from '@mdi/js'
 import FullScreenSection from '@/components/FullScreenSection.vue'
 import CardComponent from '@/components/CardComponent.vue'
 import Field from '@/components/Field.vue'
@@ -12,12 +12,9 @@ import JbButtons from '@/components/JbButtons.vue'
 import { useStore } from 'vuex'
 import VueBasicAlert from 'vue-basic-alert'
 
-const form = reactive({
-  username: '',
-  password: ''
-})
+const form = reactive({})
 
-const alert1 = ref(null)
+const alert = ref(null)
 
 const router = useRouter()
 
@@ -26,7 +23,7 @@ const store = useStore()
 const handleErrorsLocal = () => {
   const errors = computed(() => store.getters.getErrors)
   if (errors.value !== 'none') {
-    alert1.value.showAlert(
+    alert.value.showAlert(
       'error',
       errors.value
     )
@@ -34,24 +31,31 @@ const handleErrorsLocal = () => {
   store.dispatch('cleanErrors')
 }
 
+const getRegisterFields = computed(() => store.getters.getRegisterFields)
+
 const isAuthenticated = computed(() => store.getters.getAuthenticated)
+
+const copyValuesToForm = () => {
+  const fields = getRegisterFields.value
+  for (const f in fields) {
+    const field = fields[f].field
+    form[field] = ''
+  }
+}
 
 onBeforeMount(() => {
   if (isAuthenticated.value === true) {
     router.push('/dashboard')
   }
+  copyValuesToForm()
 })
 
 const submit = () => {
-  console.log('test login' + JSON.stringify(form))
-  store.dispatch('setLoginParams', form)
-  store.dispatch('login').then(() => {
+  console.log('test register' + JSON.stringify(form))
+  store.dispatch('setRegisterParams', form)
+  store.dispatch('register').then(() => {
     handleErrorsLocal()
-    if (store.getters.getAuthenticated === true) {
-      router.push('/dashboard')
-      store.dispatch('initCurrentDevice')
-      window.location.reload()
-    }
+    router.push('/login')
   })
 }
 </script>
@@ -68,55 +72,52 @@ const submit = () => {
       @submit.prevent="submit"
     >
       <field
-        label="Login"
-        help="Please enter your login"
+        v-for="(item, index) in getRegisterFields"
+        :key="index"
+        :label="item.column"
+        :help="item.message"
       >
-        <control
-          v-model="form.username"
-          :icon="mdiAccount"
-          name="login"
-          autocomplete="username"
-        />
-      </field>
+        <div
+          v-if="item.type === 'password'"
+        >
+          <control
+            v-model="form[item.field]"
+            :icon="module[item.icon]"
+            :name="item.column"
+            type="password"
+          />
+        </div>
+        <div
+          v-else
+        >
+          <control
+            v-model="form[item.field]"
+            :icon="module[item.icon]"
+            :name="item.column"
+          />
+        </div>
 
-      <field
-        label="Password"
-        help="Please enter your password"
-      >
-        <control
-          v-model="form.password"
-          :icon="mdiAsterisk"
-          type="password"
-          name="password"
-          autocomplete="current-password"
-        />
       </field>
 
       <divider />
 
       <jb-buttons>
         <jb-button
+          color="info"
           type="submit"
-          color="info"
-          label="Login"
-        />
-        <jb-button
-          to="/register"
-          color="info"
-          outline
           label="Register"
         />
         <jb-button
-          to="/recover"
+          to="/login"
           color="info"
+          label="Login"
           outline
-          label="Forgotten Password"
         />
       </jb-buttons>
     </card-component>
   </full-screen-section>
   <vue-basic-alert
-    ref="alert1"
+    ref="alert"
     :duration="500"
     :close-in="2000"
   />

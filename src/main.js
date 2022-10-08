@@ -5,6 +5,7 @@ import router from './router'
 import store from './store'
 import { darkModeKey, styleKey } from '@/config.js'
 import './css/main.css'
+import { autoAnimatePlugin } from '@formkit/auto-animate/vue'
 
 /* Fetch sample data */
 store.dispatch('fetch', 'clients')
@@ -39,4 +40,4 @@ router.afterEach(to => {
   store.dispatch('fullScreenToggle', !!to.meta.fullScreen)
 })
 
-createApp(App).use(store).use(router).mount('#app')
+createApp(App).use(store).use(router).use(autoAnimatePlugin).mount('#app')

@@ -73,6 +73,17 @@ const updateSelectedDevice = () => {
   )
 }
 
+const updateSendEmail = (value) => {
+  const selectedDevice = computed(() => store.getters.getCurrentDevice)
+  if (value === true || value[0] === 'enableEmailNotification') {
+    selectedDevice.value.send_email = true
+  } else {
+    selectedDevice.value.send_email = false
+  }
+  console.log(JSON.stringify(selectedDevice.value))
+  store.dispatch('updateDevice', selectedDevice.value)
+}
+
 </script>
 
 <template>
@@ -111,6 +122,7 @@ const updateSelectedDevice = () => {
               name="buttons-switch"
               type="switch"
               :options="{ enableEmailNotification: 'Notification' }"
+              @update:modelValue="updateSendEmail"
             />
           </field>
         </div>

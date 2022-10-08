@@ -1,7 +1,7 @@
 <script setup>
 import { reactive, computed, ref, onBeforeMount } from 'vue'
 import { useRouter } from 'vue-router'
-import { mdiAccount, mdiAsterisk } from '@mdi/js'
+import { mdiAt } from '@mdi/js'
 import FullScreenSection from '@/components/FullScreenSection.vue'
 import CardComponent from '@/components/CardComponent.vue'
 import Field from '@/components/Field.vue'
@@ -13,8 +13,7 @@ import { useStore } from 'vuex'
 import VueBasicAlert from 'vue-basic-alert'
 
 const form = reactive({
-  username: '',
-  password: ''
+  email: ''
 })
 
 const alert1 = ref(null)
@@ -43,14 +42,11 @@ onBeforeMount(() => {
 })
 
 const submit = () => {
-  console.log('test login' + JSON.stringify(form))
-  store.dispatch('setLoginParams', form)
-  store.dispatch('login').then(() => {
+  console.log('test email form' + JSON.stringify(form))
+  store.dispatch('forgottenPassword', form).then(() => {
     handleErrorsLocal()
     if (store.getters.getAuthenticated === true) {
-      router.push('/dashboard')
-      store.dispatch('initCurrentDevice')
-      window.location.reload()
+      router.push('/login')
     }
   })
 }
@@ -68,27 +64,13 @@ const submit = () => {
       @submit.prevent="submit"
     >
       <field
-        label="Login"
+        label="Email"
         help="Please enter your login"
       >
         <control
-          v-model="form.username"
-          :icon="mdiAccount"
-          name="login"
-          autocomplete="username"
-        />
-      </field>
-
-      <field
-        label="Password"
-        help="Please enter your password"
-      >
-        <control
-          v-model="form.password"
-          :icon="mdiAsterisk"
-          type="password"
-          name="password"
-          autocomplete="current-password"
+          v-model="form.email"
+          :icon="mdiAt"
+          name="email"
         />
       </field>
 
@@ -98,19 +80,13 @@ const submit = () => {
         <jb-button
           type="submit"
           color="info"
-          label="Login"
+          label="Send Recovery email"
         />
         <jb-button
-          to="/register"
+          to="/login"
           color="info"
           outline
-          label="Register"
-        />
-        <jb-button
-          to="/recover"
-          color="info"
-          outline
-          label="Forgotten Password"
+          label="Back to Login"
         />
       </jb-buttons>
     </card-component>

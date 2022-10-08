@@ -9,8 +9,6 @@ import {
   mdiMenu,
   mdiDevices,
   mdiAccount,
-  mdiCogOutline,
-  mdiEmail,
   mdiLogout,
   mdiThemeLightDark
 } from '@mdi/js'
@@ -27,6 +25,8 @@ const router = useRouter()
 
 const lightBorderStyle = computed(() => store.state.lightBorderStyle)
 
+const username = computed(() => store.getters.getUsername_)
+
 const toggleLightDark = () => {
   store.dispatch('darkMode')
 }
@@ -35,14 +35,14 @@ store.dispatch('initCurrentDevice')
 onMounted(() => {
   const device = computed(() => store.getters.getCurrentDevice)
   console.log(device.value)
-  store.dispatch('fetchDeviceWaterCharts', device.value.device_id)
+  if (device.value !== null) {
+    store.dispatch('fetchDeviceWaterCharts', device.value.device_id)
+  }
 })
 
 const isNavBarVisible = computed(() => !store.state.isFullScreen)
 
 const isAsideMobileExpanded = computed(() => store.state.isAsideMobileExpanded)
-
-const userName = computed(() => store.state.userName)
 
 const menuToggleMobileIcon = computed(() => isAsideMobileExpanded.value ? mdiBackburger : mdiForwardburger)
 
@@ -81,8 +81,8 @@ const changeSelectedDevice = (deviceId) => {
 const logOut = () => {
   store.dispatch('setToken', '')
   store.dispatch('setIsAuthenticated', 401)
-  console.log('out')
   router.push('/login')
+  console.log('out')
 }
 
 </script>
@@ -94,7 +94,9 @@ const logOut = () => {
     transition-position xl:pl-60 lg:w-auto lg:items-stretch dark:bg-gray-900 dark:border-gray-800"
     :class="[lightBorderStyle, {'ml-60 lg:ml-0':isAsideMobileExpanded}]"
   >
-    <div class="flex-1 items-stretch flex h-14">
+    <div
+      class="flex-1 items-stretch flex h-14"
+    >
       <nav-bar-item
         type="flex lg:hidden"
         @click.prevent="menuToggleMobile"
@@ -154,7 +156,7 @@ const logOut = () => {
           </template>
         </nav-bar-menu>
         <nav-bar-menu has-divider>
-          <nav-bar-item-label :label="userName" />
+          <nav-bar-item-label :label="username" />
           <template #dropdown>
             <nav-bar-item to="/profile">
               <nav-bar-item-label
@@ -162,24 +164,12 @@ const logOut = () => {
                 label="My Profile"
               />
             </nav-bar-item>
-            <nav-bar-item>
-              <nav-bar-item-label
-                :icon="mdiCogOutline"
-                label="Settings"
-              />
-            </nav-bar-item>
-            <nav-bar-item>
-              <nav-bar-item-label
-                :icon="mdiEmail"
-                label="Messages"
-              />
-            </nav-bar-item>
             <divider nav-bar />
             <nav-bar-item>
               <nav-bar-item-label
                 :icon="mdiLogout"
                 label="Log Out"
-                @click="test"
+                @click.prevent="logOut"
               />
             </nav-bar-item>
           </template>

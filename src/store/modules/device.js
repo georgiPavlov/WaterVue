@@ -44,6 +44,14 @@ const state = {
       readOnly: false,
       create: true,
       initialValue: 2000
+    },
+    {
+      column: 'Send Email',
+      field: 'send_email',
+      type: 'String',
+      readOnly: false,
+      create: true,
+      initialValue: false
     }
   ]
 }
@@ -69,7 +77,6 @@ const actions = {
     dispatch('cleanErrors')
     const baseURL = rootGetters.getBaseUrl
     const options = rootGetters.getOptions
-    console.log('options' + options.headers.Authorization)
     const response = await axios.get(
       baseURL.concat('/gadget_communicator_pull/api/list_devices'), options)
       .catch(
