@@ -35,6 +35,9 @@ const actions = {
         commit('setErrors', error.response.data)
       }
     )
+    if (rootGetters.getErrors !== 'none') {
+      return
+    }
     dispatch('setToken', response.data.token)
     dispatch('setIsAuthenticated', response.status)
   }
