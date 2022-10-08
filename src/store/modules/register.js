@@ -68,9 +68,7 @@ const actions = {
     dispatch('cleanErrors')
     const baseURL = rootGetters.getBaseUrl
     const options = { headers: { 'content-type': 'application/json' } }
-    console.log('')
     const isAuthenticated = rootGetters.getAuthenticated
-    console.log('isAuthenticated' + isAuthenticated)
     if (isAuthenticated) {
       return
     }

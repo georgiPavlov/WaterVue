@@ -1,8 +1,7 @@
 import {
   mdiAccountCircle,
   mdiDesktopMac,
-  mdiTable,
-  mdiResponsive
+  mdiTable
 } from '@mdi/js'
 
 export default [
@@ -28,18 +27,13 @@ export default [
     },
     {
       to: '/status',
-      label: 'StatusLogs',
+      label: 'Status Logs',
       icon: mdiTable
     },
     {
       to: '/photos',
       label: 'Photos',
       icon: mdiTable
-    },
-    {
-      to: '/responsive',
-      label: 'Responsive',
-      icon: mdiResponsive
     },
     {
       to: '/profile',

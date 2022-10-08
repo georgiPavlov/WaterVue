@@ -21,8 +21,6 @@ const actions = {
     }
     const loginParams = getters.getEmail
     loginParams.email = email_.email
-    console.log('loginParams 123' + JSON.stringify(email_))
-    console.log('loginParams' + JSON.stringify(loginParams))
     await axios.post(
       baseURL.concat('/api/auth/password/'),
       loginParams, options

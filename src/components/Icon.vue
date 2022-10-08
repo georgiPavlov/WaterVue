@@ -37,7 +37,6 @@ const store = useStore()
 
 const imageFunc = computed(() => {
   const src = 'image/'
-  console.log('dark mode ' + darkMode.value)
   if (darkMode.value) {
     return src.concat(props.path).concat('-invert.png')
   } else {

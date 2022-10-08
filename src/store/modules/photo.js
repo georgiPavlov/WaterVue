@@ -38,7 +38,6 @@ const actions = {
     dispatch('cleanErrors')
     const baseURL = rootGetters.getBaseUrl
     const options = rootGetters.getOptions
-    console.log('in fetch photos')
     const device = getters.getDeviceForPhoto
     const response = await axios.get(
       baseURL.concat('/gadget_communicator_pull/api/list_photos/device/').concat(device.device_id), options)

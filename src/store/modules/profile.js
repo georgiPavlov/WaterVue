@@ -96,7 +96,6 @@ const actions = {
         commit('setErrors', error.response.data)
       }
     )
-    console.log('testcggfdgfdgdfgdfgdfgfdgfdgfd' + JSON.stringify(response.data))
     commit('setProfileParamsM', response.data)
   },
   async profileUpdate ({ dispatch, commit, getters, rootGetters }, form) {
@@ -115,7 +114,6 @@ const actions = {
         commit('setErrors', error.response.data)
       }
     )
-    console.log('testcggfdgfdgdfgdfgdfgfdgfdgfd' + JSON.stringify(response.data))
     commit('setProfileParamsM', response.data)
   },
   async profileUpdatePass ({ dispatch, commit, getters, rootGetters }, form) {
@@ -136,7 +134,6 @@ const actions = {
         commit('setErrors', error.response.data)
       }
     )
-    console.log('testcggfdgfdgdfgdfgdfgfdgfdgfd' + JSON.stringify(response.data))
     commit('setProfileParamsM', response.data)
   }
 }
@@ -150,9 +147,7 @@ const mutations = {
     for (const f in fields) {
       const field = fields[f].field
       state.profileParams[field] = params[field]
-      console.log(state.profileParams[field])
     }
-    // state.profileParams = params
   }
 }
 

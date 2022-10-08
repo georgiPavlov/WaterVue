@@ -54,7 +54,6 @@ const actions = {
     dispatch('cleanErrors')
     const baseURL = rootGetters.getBaseUrl
     const options = rootGetters.getOptions
-    console.log('in fetch')
     const device = getters.getDeviceForStatus
     const response = await axios.get(
       baseURL.concat('/gadget_communicator_pull/api/list_status/').concat(device.device_id), options)
@@ -66,7 +65,6 @@ const actions = {
         }
       )
     dispatch('setIsAuthenticated', response.status)
-    console.log(JSON.stringify(response.data))
     commit('setStatusList', response.data)
   },
   async deleteStatus ({ dispatch, commit, getters, rootGetters }, id) {
