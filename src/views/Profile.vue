@@ -54,7 +54,7 @@ const copyValuesToForm = (fields_, params_, form_, reactive) => {
     }
   }
 }
-const titleStack = ref(['Admin', 'Profile'])
+const titleStack = ref(['Profile'])
 
 const passwordFormEmpty = reactive({
   password_current: '',

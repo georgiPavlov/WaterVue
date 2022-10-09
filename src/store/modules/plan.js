@@ -148,6 +148,26 @@ const state = {
 const getters = {
   allPlans: state => state.plans,
   getPlanType: state => state.planType,
+  getPlanNameUnderExecution: state => {
+    const basic = state.plans[state.planType].filter((d) => d.has_been_executed === false)
+    if (Object.keys(basic).length !== 0) {
+      console.log('basic')
+      return basic.at(-1).name
+    } else {
+      console.log('basic else')
+      const timeBased = state.plans[state.planType].filter((d) => d.is_running === true)
+      const moisture = state.plans[state.planType].filter((d) => d.is_running === true)
+      if (Object.keys(timeBased).length !== 0) {
+        console.log('timeBased else')
+        return timeBased.at(-1).name
+      }
+      if (Object.keys(moisture).length !== 0) {
+        console.log('moisture else')
+        return moisture.at(-1).name
+      }
+      return 'None'
+    }
+  },
   getDefaultElement: state => state.addWeekdayTimeDefaultElement,
   buttonSettingsModel: state => state.buttonSettingsModel,
   getPlansByName: (state) => (name) => {

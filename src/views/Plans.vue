@@ -24,7 +24,7 @@ const plansUpdateFields = computed(() => store.getters.getPlanUpdateFieldsState)
 
 const planErrors = computed(() => store.getters.getErrors)
 
-const titleStack = ref(['Admin', 'Tables'])
+const titleStack = ref(['Tables'])
 
 const modalCreateElementActiveT = (plan) => {
   store.dispatch('modalCreateElementActiveToggle')

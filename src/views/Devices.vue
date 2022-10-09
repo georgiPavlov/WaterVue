@@ -24,7 +24,7 @@ watch(() => devicesUpdateFields.value, () => {
   console.log('devicesUpdateFields.value ' + devicesUpdateFields.value)
 })
 
-const titleStack = ref(['Admin', 'Tables'])
+const titleStack = ref(['Tables'])
 
 const modalCreateElementActiveT = (device) => {
   JSON.stringify(devicesUpdateFields.value, null, '  ')

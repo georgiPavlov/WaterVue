@@ -23,6 +23,23 @@ const chartData = ref([])
 
 const points = computed(() => store.getters.allDeviceWaterCharts)
 
+const lastStatus = computed(() => store.getters.getLastStatus)
+
+const planNameUnderExecution = computed(() => store.getters.getPlanNameUnderExecution)
+
+// eslint-disable-next-line no-unused-vars
+const lastStatusFunc = computed(() => {
+  if (Object.keys(lastStatus.value).length === 0) {
+    return 'None'
+  }
+  if (lastStatus.value.execution_status === true) {
+    return 'Success'
+  } else if (lastStatus.value.execution_status === false) {
+    return 'Error'
+  }
+  return 'None'
+})
+
 const toArrayPoints = computed(() => points.value.map(a => a.water_chart))
 
 const fillChartData = () => {
@@ -90,7 +107,7 @@ const selectedDevice = computed(() => store.getters.getCurrentDevice)
       />
       <card-widget
         color="text-emerald-500"
-        prefix="Success"
+        :prefix="lastStatusFunc"
         label="Status"
         :number="-1"
         default-behaviour="false"
@@ -100,7 +117,7 @@ const selectedDevice = computed(() => store.getters.getCurrentDevice)
       />
       <card-widget
         color="text-emerald-500"
-        prefix="time plan 123"
+        :prefix="planNameUnderExecution"
         label="Running plan"
         :number="-1"
         default-behaviour="false"

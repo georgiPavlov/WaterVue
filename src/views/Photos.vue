@@ -80,7 +80,7 @@ const update = ref(true)
 
 <template>
   <title-bar :title-stack="titleStack" />
-  <hero-bar>Devices</hero-bar>
+  <hero-bar>Photos</hero-bar>
   <main-section>
     <jb-buttons
       type="justify-start lg:justify-end"

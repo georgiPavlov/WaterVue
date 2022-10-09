@@ -43,6 +43,12 @@ const getters = {
   getStatusById: (state) => (id) => {
     return state.statusList.find((d) => d.status_id === id)
   },
+  getLastStatus: state => {
+    if (Object.keys(state.statusList).length !== 0) {
+      return []
+    }
+    return state.statusList.at(-1)
+  },
   getStatusUpdateFieldsState: state => state.statusUpdateFieldsState,
   getDeviceForStatus: (state, getters, rootState, rootGetters) => {
     return rootGetters.getCurrentDevice

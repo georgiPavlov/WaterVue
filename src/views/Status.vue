@@ -20,7 +20,7 @@ const statusList = computed(() => store.getters.allStatusList)
 
 const statusUpdateFields = computed(() => store.getters.getStatusUpdateFieldsState)
 
-const titleStack = ref(['Admin', 'Tables'])
+const titleStack = ref(['Tables'])
 
 const modalDeleteElementActiveT = () => {
   store.dispatch('modalDeleteElementActiveToggle')
