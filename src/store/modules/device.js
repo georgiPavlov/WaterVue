@@ -70,6 +70,9 @@ const actions = {
   async initCurrentDevice ({ commit }) {
     commit('mInitCurrentDeviceLabel')
   },
+  async setCurrentDeviceToNull ({ commit }) {
+    commit('mSetCurrentDeviceToNull')
+  },
   async setDeviceLabel ({ commit }, device) {
     commit('mSetDeviceSelect', device)
   },
@@ -162,6 +165,9 @@ const mutations = {
     if (state.deviceSelect === null) {
       (state.deviceSelect = state.devices.length !== 0 ? state.devices[0] : null)
     }
+  },
+  mSetCurrentDeviceToNull (state) {
+    (state.deviceSelect = null)
   },
   mSetDeviceSelect (state, device) {
     (state.deviceSelect = device)

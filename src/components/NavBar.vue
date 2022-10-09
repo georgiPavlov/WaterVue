@@ -81,6 +81,7 @@ const changeSelectedDevice = (deviceId) => {
 const logOut = () => {
   store.dispatch('setToken', '')
   store.dispatch('setIsAuthenticated', 401)
+  store.dispatch('setCurrentDeviceToNull')
   router.push('/login')
   console.log('out')
 }
@@ -165,13 +166,6 @@ const logOut = () => {
               />
             </nav-bar-item>
             <divider nav-bar />
-            <nav-bar-item>
-              <nav-bar-item-label
-                :icon="mdiLogout"
-                label="Log Out"
-                @click.prevent="logOut"
-              />
-            </nav-bar-item>
           </template>
         </nav-bar-menu>
         <nav-bar-item

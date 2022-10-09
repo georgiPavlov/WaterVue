@@ -181,8 +181,10 @@ const getters = {
     if (state.planUpdateFieldsState === undefined || state.planUpdateFieldsState.length === 0) {
       return true
     }
+    if (state.planType.at(0) === 0) {
+      return false
+    }
     return true
-    // return !(state.planType.at(0) === 2 || state.planType.at(0) === 1)
   },
   getPlanUpdateFieldsState: state => state.planUpdateFieldsState,
   getPlanUpdateFieldsStateBasic: state => state.planUpdateFieldsStateBasic,
@@ -196,6 +198,7 @@ const getters = {
 const actions = {
   async restartPLanExecution ({ dispatch, commit, getters, rootGetters }, payload) {
     dispatch('cleanErrors')
+    console.log('restartPLanExecutiondsfdsfdsfdsfds ' + JSON.stringify(payload))
     const baseURL = rootGetters.getBaseUrl
     const options = rootGetters.getOptions
     const plan = payload.plan_
@@ -208,6 +211,7 @@ const actions = {
     } else {
       planCopy.has_been_executed = false
     }
+    console.log('restartPLanExecution1232321321321312 ' + JSON.stringify(planCopy))
     const response = await axios.post(
       baseURL.concat('/gadget_communicator_pull/api/update_plan'),
       planCopy, options
@@ -251,8 +255,14 @@ const actions = {
     dispatch('cleanErrors')
     const baseURL = rootGetters.getBaseUrl
     const options = rootGetters.getOptions
+    const plan = getters.getPlansByName(idName)
+    console.log(JSON.stringify(plan))
+    if (plan.plan_type === 'basic') {
+      return
+    }
     const deletePlanCopy = { ...state.deletePlan }
     deletePlanCopy.plan_to_stop = idName
+    console.log(deletePlanCopy)
     const response = await axios.post(
       baseURL.concat('/gadget_communicator_pull/api/update_plan'),
       deletePlanCopy, options

@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref, watch } from 'vue'
+import { computed, onBeforeMount, ref, watch } from 'vue'
 import CardComponent from '@/components/CardComponent.vue'
 import Level from '@/components/Level.vue'
 import JbButton from '@/components/JbButton.vue'
@@ -15,6 +15,12 @@ const alert = ref(null)
 const enableEmailNotification = computed(() => buttonSettingsModel.value.indexOf('enableEmailNotification') > -1)
 
 watch(() => enableEmailNotification.value, () => {
+  if (buttonSettingsModel.value === null) {
+    return
+  }
+  if (alert.value === null) {
+    return
+  }
   console.log(
     'Watch props.selected function called with args:' + enableEmailNotification.value)
   alert.value.showAlert(
@@ -83,6 +89,14 @@ const updateSendEmail = (value) => {
   console.log(JSON.stringify(selectedDevice.value))
   store.dispatch('updateDevice', selectedDevice.value)
 }
+
+onBeforeMount(() => {
+  const selectedDevice = computed(() => store.getters.getCurrentDevice)
+  console.log('DEvice::::::' + JSON.stringify(selectedDevice.value))
+  if (selectedDevice.value.send_email === true) {
+    buttonSettingsModel.value[0] = 'enableEmailNotification'
+  }
+})
 
 </script>
 

@@ -264,10 +264,18 @@ const sendRestartExecution = (row, mode) => {
   selection.value = getValueByKey(props.idName, row)
   convertToReactive(row)
   emit(mode, selection.value)
-  alert.value.showAlert(
-    'warning',
-    'Running plan stopped: ' + selection.value
-  )
+  const plan = store.getters.getPlansByName(selection.value)
+  if (plan.plan_type === 'basic') {
+    alert.value.showAlert(
+      'warning',
+      'Can not stop running plan: ' + selection.value
+    )
+  } else {
+    alert.value.showAlert(
+      'warning',
+      'Running plan stopped: ' + selection.value
+    )
+  }
 }
 
 const convertToReactive = (row) => {
@@ -669,12 +677,12 @@ const showItemsForNewItem = () => {
             <div v-else-if="item.type === 'checkbox'">
               <div v-if="getValueByKey(item.field, row) !== buttonCompareValue">
                 <jb-button
-                  color="danger"
+                  color="success"
                 />
               </div>
               <div v-else>
                 <jb-button
-                  color="success"
+                  color="danger"
                 />
               </div>
             </div>

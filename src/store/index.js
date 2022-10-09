@@ -19,7 +19,7 @@ export default new Vuex.Store({
   state: {
     tokenType: 'Bearer ',
     token: '',
-    baseURL: 'http://127.0.0.1:8080',
+    baseURL: 'http://192.168.1.17:8080',
     options: {
       headers: {
         Authorization: 'none'

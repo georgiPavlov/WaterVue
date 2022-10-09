@@ -44,7 +44,7 @@ const getters = {
     return state.statusList.find((d) => d.status_id === id)
   },
   getLastStatus: state => {
-    if (Object.keys(state.statusList).length !== 0) {
+    if (Object.keys(state.statusList).length === 0) {
       return []
     }
     return state.statusList.at(-1)
