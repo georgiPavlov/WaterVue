@@ -92,7 +92,6 @@ const updateSendEmail = (value) => {
 
 onBeforeMount(() => {
   const selectedDevice = computed(() => store.getters.getCurrentDevice)
-  console.log('DEvice::::::' + JSON.stringify(selectedDevice.value))
   if (selectedDevice.value.send_email === true) {
     buttonSettingsModel.value[0] = 'enableEmailNotification'
   }

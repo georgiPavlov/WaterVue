@@ -80,7 +80,6 @@ const handleErrorsLocal = (message) => {
 
 const submitProfile = () => {
   form.password = formPassword.password
-  console.log('test register' + JSON.stringify(form))
   store.dispatch('profileUpdate', form).then(() => {
     handleErrorsLocal('successfully updated profile')
   })
@@ -88,7 +87,6 @@ const submitProfile = () => {
 }
 
 const submitPass = () => {
-  console.log('test register' + JSON.stringify(form))
   store.dispatch('profileUpdatePass', formPassword).then(() => {
     handleErrorsLocal('successfully updated profile password')
   })

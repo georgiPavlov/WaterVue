@@ -42,7 +42,6 @@ onBeforeMount(() => {
 })
 
 const submit = () => {
-  console.log('test email form' + JSON.stringify(form))
   store.dispatch('forgottenPassword', form).then(() => {
     handleErrorsLocal()
     if (store.getters.getAuthenticated === true) {

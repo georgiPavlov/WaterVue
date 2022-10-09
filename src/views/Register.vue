@@ -51,7 +51,6 @@ onBeforeMount(() => {
 })
 
 const submit = () => {
-  console.log('test register' + JSON.stringify(form))
   store.dispatch('setRegisterParams', form)
   store.dispatch('register').then(() => {
     handleErrorsLocal()

@@ -46,12 +46,10 @@ const handleErrors = () => {
 }
 
 const modalCreatePlan = (plan, errorsHandler) => {
-  console.log('crate~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~``')
   store.dispatch('addPlan', plan).then(() => {
     handleErrors()
     errorsHandler()
   })
-  console.log('end of modal crate4354354389574389564389756438975643987')
 }
 
 const modalEditPlan = (plan, errorsHandler) => {

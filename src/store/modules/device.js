@@ -70,6 +70,9 @@ const actions = {
   async initCurrentDevice ({ commit }) {
     commit('mInitCurrentDeviceLabel')
   },
+  async setCurrentDevice ({ commit }, device) {
+    commit('mSetCurrentDevice', device)
+  },
   async setCurrentDeviceToNull ({ commit }) {
     commit('mSetCurrentDeviceToNull')
   },
@@ -157,17 +160,43 @@ const actions = {
         }
       )
     commit('getDeviceWaterCharts', response.data)
+  },
+  async updateCurrentDevice ({ dispatch, commit, getters, rootGetters }) {
+    dispatch('cleanErrors')
+    const baseURL = rootGetters.getBaseUrl
+    const options = rootGetters.getOptions
+    const response = await axios.get(
+      baseURL.concat('/gadget_communicator_pull/api/list_devices'), options)
+      .catch(
+        function (error) {
+          dispatch('setIsAuthenticated', error.response.status)
+          console.log('Show error notification!')
+          return Promise.reject(error)
+        }
+      )
+    dispatch('setIsAuthenticated', response.status)
+    // dispatch('fetchDevices')
+    commit('setDevices', response.data)
+    commit('mUpdateCurrentDevice')
   }
 }
 
 const mutations = {
+  mUpdateCurrentDevice (state) {
+    const deviceSelect = state.deviceSelect.device_id
+    const d = state.devices.filter(device => device.device_id === deviceSelect)[0]
+    console.log(JSON.stringify(d))
+    state.deviceSelect = d
+  },
   mInitCurrentDeviceLabel (state) {
     if (state.deviceSelect === null) {
       (state.deviceSelect = state.devices.length !== 0 ? state.devices[0] : null)
     }
   },
   mSetCurrentDeviceToNull (state) {
-    (state.deviceSelect = null)
+    console.log('select mSetCurrentDeviceToNull')
+    console.log(JSON.stringify(state.deviceSelect))
+    state.deviceSelect = null
   },
   mSetDeviceSelect (state, device) {
     (state.deviceSelect = device)

@@ -43,7 +43,6 @@ const handleErrorsLocal = (message) => {
 }
 
 const modalDeleteStatus = (selection, errorsHandler) => {
-  console.log('test status' + selection)
   store.dispatch('deleteStatus', selection).then(() => {
     handleErrorsLocal('Error deleting message')
   })

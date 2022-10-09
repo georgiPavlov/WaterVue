@@ -48,7 +48,6 @@ const handleErrors = () => {
 }
 
 const modalCreateDevice = (device, errorsHandler) => {
-  console.log('modalCreateDevice ' + device.label)
   JSON.stringify(device, null, '  ')
   store.dispatch('addDevice', device).then(() => {
     handleErrors()
@@ -57,7 +56,6 @@ const modalCreateDevice = (device, errorsHandler) => {
 }
 
 const modalEditDevice = (device, errorsHandler) => {
-  console.log('modalEditDevice2 ' + device)
   JSON.stringify(device, null, '  ')
   store.dispatch('updateDevice', device).then(() => {
     handleErrors()

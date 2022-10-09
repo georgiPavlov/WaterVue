@@ -49,8 +49,16 @@ const fillChartData = () => {
 const fillChartsCompute = computed(() => fillChartData())
 
 onMounted(() => {
+  reInitCurrentDevice()
   fillChartData()
 })
+
+// eslint-disable-next-line no-unused-vars
+const reInitCurrentDevice = () => {
+  store.dispatch('updateCurrentDevice')
+  // // eslint-disable-next-line no-self-assign
+  // deviceSelect.value.label = deviceSelect.value.label
+}
 
 const store = useStore()
 
