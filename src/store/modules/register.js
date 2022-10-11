@@ -71,7 +71,7 @@ const actions = {
       headers: {
         'content-type': 'application/json',
         Authorization: 'none',
-        'Access-Control-Allow-Origin': 'http://water-me-lb-842691727.eu-central-1.elb.amazonaws.com',
+        'Access-Control-Allow-Origin': 'http://water-me-lb-842691727.eu-central-1.elb.amazonaws.com:8080',
         'Access-Control-Allow-Methods': 'GET, POST, PUT',
         'Access-Control-Allow-Headers': 'Content-Type'
       }
