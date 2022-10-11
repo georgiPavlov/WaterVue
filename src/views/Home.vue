@@ -14,7 +14,7 @@ import HeroBar from '@/components/HeroBar.vue'
 import CardWidget from '@/components/CardWidget.vue'
 import CardComponent from '@/components/CardComponent.vue'
 import TitleSubBar from '@/components/TitleSubBar.vue'
-import CardWithButton from '@/components/CardWithButton'
+import CardWithButton from '@/components/CardWithButton.vue'
 import JbButton from '@/components/JbButton.vue'
 
 const titleStack = ref(['Water System'])
