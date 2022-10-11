@@ -71,6 +71,6 @@ const spanClass = computed(() => `inline-flex justify-center items-center ${prop
         :height="formatHeight"
         :src="imageFunc"
         alt="capacity"
-      />
+      >
     </div></span>
 </template>

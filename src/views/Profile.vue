@@ -136,7 +136,6 @@ const submitPass = () => {
               :name="item.column"
             />
           </div>
-
         </field>
         <divider />
 
@@ -180,7 +179,6 @@ const submitPass = () => {
               :name="item.column"
             />
           </div>
-
         </field>
 
         <divider />

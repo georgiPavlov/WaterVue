@@ -95,7 +95,6 @@ const submit = () => {
             :name="item.column"
           />
         </div>
-
       </field>
 
       <divider />
