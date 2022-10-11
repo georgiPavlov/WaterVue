@@ -19,7 +19,15 @@ const actions = {
   async login ({ dispatch, commit, getters, rootGetters }) {
     dispatch('cleanErrors')
     const baseURL = rootGetters.getBaseUrl
-    const options = { headers: { 'content-type': 'application/json' } }
+    const options = {
+      headers: {
+        'content-type': 'application/json',
+        Authorization: 'none',
+        'Access-Control-Allow-Origin': 'http://water-me-lb-842691727.eu-central-1.elb.amazonaws.com',
+        'Access-Control-Allow-Methods': 'GET, POST, PUT',
+        'Access-Control-Allow-Headers': 'Content-Type'
+      }
+    }
     const isAuthenticated = rootGetters.getAuthenticated
     if (isAuthenticated) {
       return
