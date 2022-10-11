@@ -1,6 +1,7 @@
 module.exports = {
   content: [
     './public/index.html',
+    './public/image/*.{vue,js,ts,jsx,tsx}',
     './src/**/*.{vue,js,ts,jsx,tsx}'
   ],
   darkMode: 'class', // or 'media' or 'class'
@@ -35,7 +36,7 @@ module.exports = {
         fadeIn: 'fadeIn 250ms ease-in-out'
       },
       backgroundImage: {
-        'login-image': "url('img/Untitled-Artwork.png')"
+        'login-image': "url('image/Untitled-Artwork.png')"
       }
     }
   },
