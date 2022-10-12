@@ -3,6 +3,7 @@ import vue from '@vitejs/plugin-vue'
 import { VitePWA } from 'vite-plugin-pwa'
 import { resolve } from 'path'
 import mkcert from 'vite-plugin-mkcert'
+import pluginRewriteAll from 'vite-plugin-rewrite-all'
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -11,10 +12,10 @@ export default defineConfig({
   },
   plugins: [
     vue(),
+    pluginRewriteAll(),
     mkcert(),
     VitePWA(
       {
-        registerType: 'autoUpdate',
         workbox: {
           maximumFileSizeToCacheInBytes: 50000000
         }
@@ -23,9 +24,10 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      '@': resolve(__dirname, 'src'),
-      vue: 'vue/dist/vue.esm-bundler.js'
+      '@': resolve(__dirname, 'src')
     }
   },
-  base: './'
+  define: {
+    'process.env': {}
+  }
 })
