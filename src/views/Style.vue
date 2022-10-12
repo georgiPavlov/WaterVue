@@ -25,7 +25,7 @@ const router = useRouter()
 const click = slug => {
   store.dispatch('setStyle', slug)
   store.dispatch('darkMode', false)
-  router.push('/dashboard')
+  router.push('/login')
 }
 </script>
 
