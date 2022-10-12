@@ -47,7 +47,6 @@ const emit = defineEmits(['update:modelValue', 'right-icon-click'])
 
 const computedValue = computed({
   get: () => {
-    console.log('props' + props.modelValue)
     return props.modelValue
   },
   set: value => {
