@@ -19,7 +19,7 @@ export default new Vuex.Store({
   state: {
     tokenType: 'Bearer ',
     token: '',
-    baseURL: 'http://127.0.0.1:8000',
+    baseURL: 'http://water-me-lb-842691727.eu-central-1.elb.amazonaws.com',
     options: {
       headers: {
         Authorization: 'none'
