@@ -96,7 +96,9 @@ const actions = {
         commit('setErrors', error.response.data)
       }
     )
-    commit('setProfileParamsM', response.data)
+    if (typeof response !== 'undefined') {
+      commit('setProfileParamsM', response.data)
+    }
   },
   async profileUpdate ({ dispatch, commit, getters, rootGetters }, form) {
     dispatch('cleanErrors')
@@ -114,7 +116,9 @@ const actions = {
         commit('setErrors', error.response.data)
       }
     )
-    commit('setProfileParamsM', response.data)
+    if (typeof response !== 'undefined') {
+      commit('setProfileParamsM', response.data)
+    }
   },
   async profileUpdatePass ({ dispatch, commit, getters, rootGetters }, form) {
     dispatch('cleanErrors')
@@ -134,7 +138,9 @@ const actions = {
         commit('setErrors', error.response.data)
       }
     )
-    commit('setProfileParamsM', response.data)
+    if (typeof response !== 'undefined') {
+      commit('setProfileParamsM', response.data)
+    }
   }
 }
 

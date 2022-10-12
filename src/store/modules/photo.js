@@ -50,9 +50,11 @@ const actions = {
           return Promise.reject(error)
         }
       )
-    dispatch('setIsAuthenticated', response.status)
-    console.log(JSON.stringify(response.data))
-    commit('setPhotosList', response.data)
+    if (typeof response !== 'undefined') {
+      dispatch('setIsAuthenticated', response.status)
+      console.log(JSON.stringify(response.data))
+      commit('setPhotosList', response.data)
+    }
   },
   async deletePhoto ({ dispatch, commit, getters, rootGetters }, id) {
     dispatch('cleanErrors')
@@ -66,8 +68,10 @@ const actions = {
         commit('setErrors', error.response.data)
       }
     )
-    dispatch('setIsAuthenticated', response.status)
-    commit('removePhoto', id)
+    if (typeof response !== 'undefined') {
+      dispatch('setIsAuthenticated', response.status)
+      commit('removePhoto', id)
+    }
   },
   async takePhoto ({ dispatch, commit, getters, rootGetters }) {
     dispatch('cleanErrors')
@@ -82,16 +86,20 @@ const actions = {
         commit('setErrors', error.response.data)
       }
     )
-    const urlGet = baseURL.concat('/gadget_communicator_pull/api/photo_operation/').concat(responseCreate.data.id)
-    const response = await axios.get(urlGet, options).catch(
-      function (error) {
-        dispatch('setIsAuthenticated', error.response.status)
-        console.log('Show error notification!')
-        return Promise.reject(error)
+    if (typeof responseCreate !== 'undefined') {
+      const urlGet = baseURL.concat('/gadget_communicator_pull/api/photo_operation/').concat(responseCreate.data.id)
+      const response = await axios.get(urlGet, options).catch(
+        function (error) {
+          dispatch('setIsAuthenticated', error.response.status)
+          console.log('Show error notification!')
+          return Promise.reject(error)
+        }
+      )
+      if (typeof response !== 'undefined') {
+        dispatch('setIsAuthenticated', response.status)
+        commit('takePhotoM', response.data)
       }
-    )
-    dispatch('setIsAuthenticated', response.status)
-    commit('takePhotoM', response.data)
+    }
   },
   async downloadPhoto ({ dispatch, commit, getters, rootGetters }, id) {
     dispatch('cleanErrors')

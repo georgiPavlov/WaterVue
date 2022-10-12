@@ -110,8 +110,9 @@ const actions = {
         commit('setErrors', error.response.data)
       }
     )
-
-    commit('newDevice', response.data)
+    if (typeof response !== 'undefined') {
+      commit('newDevice', response.data)
+    }
   },
   async deleteDevice ({ dispatch, commit, getters, rootGetters }, id) {
     dispatch('cleanErrors')
@@ -174,10 +175,12 @@ const actions = {
           return Promise.reject(error)
         }
       )
-    dispatch('setIsAuthenticated', response.status)
-    // dispatch('fetchDevices')
-    commit('setDevices', response.data)
-    commit('mUpdateCurrentDevice')
+    if (typeof response !== 'undefined') {
+      dispatch('setIsAuthenticated', response.status)
+      // dispatch('fetchDevices')
+      commit('setDevices', response.data)
+      commit('mUpdateCurrentDevice')
+    }
   }
 }
 

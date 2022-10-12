@@ -70,8 +70,10 @@ const actions = {
           return Promise.reject(error)
         }
       )
-    dispatch('setIsAuthenticated', response.status)
-    commit('setStatusList', response.data)
+    if (typeof response !== 'undefined') {
+      dispatch('setIsAuthenticated', response.status)
+      commit('setStatusList', response.data)
+    }
   },
   async deleteStatus ({ dispatch, commit, getters, rootGetters }, id) {
     dispatch('cleanErrors')
@@ -85,8 +87,10 @@ const actions = {
         commit('setErrors', error.response.data)
       }
     )
-    dispatch('setIsAuthenticated', response.status)
-    commit('removeStatus', id)
+    if (typeof response !== 'undefined') {
+      dispatch('setIsAuthenticated', response.status)
+      commit('removeStatus', id)
+    }
   }
 }
 

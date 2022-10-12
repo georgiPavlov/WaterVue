@@ -198,7 +198,6 @@ const getters = {
 const actions = {
   async restartPLanExecution ({ dispatch, commit, getters, rootGetters }, payload) {
     dispatch('cleanErrors')
-    console.log('restartPLanExecutiondsfdsfdsfdsfds ' + JSON.stringify(payload))
     const baseURL = rootGetters.getBaseUrl
     const options = rootGetters.getOptions
     const plan = payload.plan_
@@ -211,7 +210,6 @@ const actions = {
     } else {
       planCopy.has_been_executed = false
     }
-    console.log('restartPLanExecution1232321321321312 ' + JSON.stringify(planCopy))
     const response = await axios.post(
       baseURL.concat('/gadget_communicator_pull/api/update_plan'),
       planCopy, options
@@ -222,8 +220,10 @@ const actions = {
         commit('setErrors', error.response.data)
       }
     )
-    dispatch('setIsAuthenticated', response.status)
-    commit('updatePlan', plan)
+    if (typeof response !== 'undefined') {
+      dispatch('setIsAuthenticated', response.status)
+      commit('updatePlan', plan)
+    }
   },
   async updatePlan ({ dispatch, commit, getters, rootGetters }, plan) {
     dispatch('cleanErrors')
@@ -247,8 +247,10 @@ const actions = {
         commit('setErrors', error.response.data)
       }
     )
-    dispatch('setIsAuthenticated', response.status)
-    commit('updatePlan', plan)
+    if (typeof response !== 'undefined') {
+      dispatch('setIsAuthenticated', response.status)
+      commit('updatePlan', plan)
+    }
   },
 
   async stopPlan ({ dispatch, commit, getters, rootGetters }, idName) {
@@ -295,19 +297,23 @@ const actions = {
             commit('setErrors', error.response.data)
           }
         )
-        dispatch('setIsAuthenticated', response.status)
+        if (typeof response !== 'undefined') {
+          dispatch('setIsAuthenticated', response.status)
+        }
       }
     }
     const url = baseURL.concat('/gadget_communicator_pull/api/delete_plan/').concat(idName)
-    const response = await axios.delete(url, options).catch(
+    const responseDel = await axios.delete(url, options).catch(
       function (error) {
         dispatch('setIsAuthenticated', error.response.status)
         console.log('Show error notification!' + JSON.stringify(error.response.data))
         return Promise.reject(error)
       }
     )
-    dispatch('setIsAuthenticated', response.status)
-    commit('removePlan', idName)
+    if (typeof responseDel !== 'undefined') {
+      dispatch('setIsAuthenticated', responseDel.status)
+      commit('removePlan', idName)
+    }
   },
   setButtonSettingsModel ({ commit }) {
     commit('setButtonSettingsModelM')
@@ -329,8 +335,10 @@ const actions = {
         console.log('Show error notification!' + JSON.stringify(error.response.data))
         return Promise.reject(error)
       })
-    dispatch('setIsAuthenticated', response.status)
-    commit('setPlans', response.data)
+    if (typeof response !== 'undefined') {
+      dispatch('setIsAuthenticated', response.status)
+      commit('setPlans', response.data)
+    }
   },
   async addPlan ({ dispatch, commit, getters, rootGetters }, p) {
     dispatch('cleanErrors')
@@ -359,9 +367,11 @@ const actions = {
       console.log('Show error notification!' + JSON.stringify(error.response.data))
       commit('setErrors', error.response.data)
     })
-    dispatch('setIsAuthenticated', response.status)
-    if (getters.getErrors === 'none') {
-      commit('newPlan', response.data)
+    if (typeof response !== 'undefined') {
+      dispatch('setIsAuthenticated', response.status)
+      if (getters.getErrors === 'none') {
+        commit('newPlan', response.data)
+      }
     }
   }
 }

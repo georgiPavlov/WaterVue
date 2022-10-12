@@ -36,7 +36,7 @@ module.exports = {
         fadeIn: 'fadeIn 250ms ease-in-out'
       },
       backgroundImage: {
-        'login-image': "url('../image/Untitled-Artwork.png')"
+        'login-image': "url('image/Untitled-Artwork.png')"
       }
     }
   },
