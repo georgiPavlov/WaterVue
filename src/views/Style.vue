@@ -4,6 +4,7 @@ import { useStore } from 'vuex'
 import { sectionBgLogin } from '@/colors.js'
 import MainSection from '@/components/MainSection.vue'
 import CardComponent from '@/components/CardComponent.vue'
+import { onBeforeMount } from 'vue'
 
 const styles = [
   {
@@ -21,6 +22,10 @@ const store = useStore()
 store.dispatch('darkMode', false)
 
 const router = useRouter()
+
+onBeforeMount(() => {
+  router.push('/login')
+})
 
 const click = slug => {
   store.dispatch('setStyle', slug)
