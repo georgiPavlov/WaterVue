@@ -24,7 +24,11 @@ store.dispatch('darkMode', false)
 const router = useRouter()
 
 onBeforeMount(() => {
-  router.push('/login')
+  if (store.getters.getAuthenticated === false) {
+    router.push('/login')
+  } else {
+    router.push('/dashboard')
+  }
 })
 
 const click = slug => {

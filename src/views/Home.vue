@@ -1,11 +1,12 @@
 <script setup>
-import { computed, ref, onMounted } from 'vue'
+import {computed, ref, onMounted, onBeforeMount} from 'vue'
 import { useStore } from 'vuex'
 import {
   mdiFinance,
   mdiReload,
   mdiChartPie
 } from '@mdi/js'
+import { useRouter } from 'vue-router'
 import * as chartConfig from '@/components/Charts/chart.config.js'
 import LineChart from '@/components/Charts/LineChart.vue'
 import MainSection from '@/components/MainSection.vue'
@@ -47,6 +48,14 @@ const fillChartData = () => {
 }
 
 const fillChartsCompute = computed(() => fillChartData())
+
+const router = useRouter()
+
+onBeforeMount(() => {
+  if (store.getters.getAuthenticated === false) {
+    router.push('/login')
+  }
+})
 
 onMounted(() => {
   reInitCurrentDevice()
