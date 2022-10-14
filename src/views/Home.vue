@@ -1,5 +1,5 @@
 <script setup>
-import {computed, ref, onMounted, onBeforeMount} from 'vue'
+import { computed, ref, onMounted, onBeforeMount } from 'vue'
 import { useStore } from 'vuex'
 import {
   mdiFinance,
