@@ -6,7 +6,6 @@ import store from './store'
 import { darkModeKey, styleKey } from '@/config.js'
 import './css/main.css'
 import { autoAnimatePlugin } from '@formkit/auto-animate/vue'
-import './registerServiceWorker'
 
 /* Fetch sample data */
 store.dispatch('fetch', 'clients')
