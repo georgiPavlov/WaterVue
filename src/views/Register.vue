@@ -27,6 +27,11 @@ const handleErrorsLocal = () => {
       'error',
       errors.value
     )
+  } else {
+    alert.value.showAlert(
+      'success',
+      'Successful registration'
+    )
   }
   store.dispatch('cleanErrors')
 }
@@ -51,10 +56,11 @@ onBeforeMount(() => {
 })
 
 const submit = () => {
-  store.dispatch('setRegisterParams', form)
+  store.dispatch('setRegisterParams', form).then(() => {
+    handleErrorsLocal()
+  })
   store.dispatch('register').then(() => {
     handleErrorsLocal()
-    router.push('/login')
   })
 }
 </script>

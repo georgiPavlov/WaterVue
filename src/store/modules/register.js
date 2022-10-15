@@ -62,6 +62,7 @@ const getters = {
 
 const actions = {
   async setRegisterParams ({ dispatch, commit, getters, rootGetters }, params) {
+    dispatch('cleanErrors')
     commit('setRegisterParamsM', params)
   },
   async register ({ dispatch, commit, getters, rootGetters }) {
