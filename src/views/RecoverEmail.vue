@@ -93,6 +93,6 @@ const submit = () => {
   <vue-basic-alert
     ref="alert1"
     :duration="500"
-    :close-in="2000"
+    :close-in="5000"
   />
 </template>

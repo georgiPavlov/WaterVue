@@ -61,11 +61,11 @@ const submit = () => {
 
 <template>
   <full-screen-section
-    v-slot="{ cardClass, cardRounded }"
+    v-slot="{cardRounded }"
     bg="login"
   >
     <card-component
-      :class="cardClass"
+      class="shadow-lg w-11/12 max-h-modal md:w-4/5 lg:w-3/5 z-50"
       :rounded="cardRounded"
       form
       @submit.prevent="submit"
@@ -117,6 +117,6 @@ const submit = () => {
   <vue-basic-alert
     ref="alert"
     :duration="500"
-    :close-in="2000"
+    :close-in="5000"
   />
 </template>

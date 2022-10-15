@@ -126,7 +126,7 @@ onBeforeMount(() => {
           <vue-basic-alert
             ref="alert"
             :duration="500"
-            :close-in="2000"
+            :close-in="5000"
           />
           <field>
             <check-radio-picker
