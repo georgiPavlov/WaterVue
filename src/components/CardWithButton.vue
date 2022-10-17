@@ -86,7 +86,6 @@ const updateSendEmail = (value) => {
   } else {
     selectedDevice.value.send_email = false
   }
-  console.log(JSON.stringify(selectedDevice.value))
   store.dispatch('updateDevice', selectedDevice.value)
 }
 
