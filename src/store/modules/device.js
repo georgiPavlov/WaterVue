@@ -52,6 +52,15 @@ const state = {
       readOnly: false,
       create: true,
       initialValue: false
+    },
+    {
+      column: 'Connection status',
+      field: 'is_connected',
+      type: 'checkbox',
+      readOnly: true,
+      create: false,
+      hide: false,
+      initialValue: false
     }
   ]
 }

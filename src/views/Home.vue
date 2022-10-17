@@ -75,6 +75,13 @@ const devices = computed(() => store.getters.allDevices)
 
 const selectedDevice = computed(() => store.getters.getCurrentDevice)
 
+const connected = computed(() => {
+  if (selectedDevice.value.is_connected === true) {
+    return { status: 'connected', color: 'up' }
+  }
+  return { status: 'disconnected', color: 'down' }
+})
+
 </script>
 
 <template>
@@ -83,7 +90,7 @@ const selectedDevice = computed(() => store.getters.getCurrentDevice)
   <main-section v-if="devices.length !== 0">
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:h-100 mb-6">
       <card-widget
-        color="text-emerald-500"
+        color="text-emerald-900"
         :prefix="selectedDevice.label"
         label="Device"
         :number="-1"
@@ -91,6 +98,8 @@ const selectedDevice = computed(() => store.getters.getCurrentDevice)
         icon="device-name"
         format-height="130"
         format-width="100"
+        :trend="connected.status"
+        :trend-type="connected.color"
       />
       <card-widget
         color="text-emerald-500"
