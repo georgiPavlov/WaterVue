@@ -164,73 +164,75 @@ const stopPLanExecution = (selectionId) => {
 </script>
 
 <template>
-  <title-bar :title-stack="titleStack" />
-  <hero-bar>Plans</hero-bar>
-  <main-section>
-    <field label="Plans">
-      <check-radio-picker
-        v-model="buttonSettingsModel"
-        name="buttons-switch"
-        type="switch"
-        :options="{ basic: 'Basic', time: 'Time', moisture: 'Moisture' }"
-        @update:modelValue="setAllButOneToFalse"
-      />
-    </field>
-    <jb-buttons
-      type="justify-start lg:justify-end"
-      no-wrap
-    >
-      <jb-button
-        type="reset"
-        color="info"
-        outline
-        label="Create"
-        @click="modalCreateElementActiveT"
-      />
-      <jb-button
-        type="reset"
-        color="danger"
-        outline
-        label="Delete"
-        @click="modalDeleteElementActiveT"
-      />
-    </jb-buttons>
-    <divider />
+  <div class="overflow-y-hidden">
+    <title-bar :title-stack="titleStack" />
+    <hero-bar>Plans</hero-bar>
+    <main-section>
+      <field label="Plans">
+        <check-radio-picker
+          v-model="buttonSettingsModel"
+          name="buttons-switch"
+          type="switch"
+          :options="{ basic: 'Basic', time: 'Time', moisture: 'Moisture' }"
+          @update:modelValue="setAllButOneToFalse"
+        />
+      </field>
+      <jb-buttons
+        type="justify-start lg:justify-end"
+        no-wrap
+      >
+        <jb-button
+          type="reset"
+          color="info"
+          outline
+          label="Create"
+          @click="modalCreateElementActiveT"
+        />
+        <jb-button
+          type="reset"
+          color="danger"
+          outline
+          label="Delete"
+          @click="modalDeleteElementActiveT"
+        />
+      </jb-buttons>
+      <divider />
 
-    <card-component
-      class="mb-6"
-      title="Clients"
-      :icon="mdiAccountMultiple"
-      has-table
-    >
-      <clients-table
-        v-if="update"
-        checkable
-        :rows="plans"
-        :item-table-columns="plansUpdateFields"
-        items-box="Timers"
-        id-name="name"
-        type-element="plan"
-        :show-items-always="show"
-        :show-radio-buttons1="true"
-        :limit="true"
-        :limit-number="100"
-        @delete="modalDeletePlan"
-        @create="modalCreatePlan"
-        @edit="modalEditPlan"
-        @create_item="modalCreateTimeItem"
-        @create_item_object_creator="modalCreateTimeItemNew"
-        @delete_item="modalDeleteTimeItem"
-        @delete_item_new="modalDeleteTimeItem"
-        @radio_elements="setAllButOneToFalse"
-        @restart_operation="restartPLanExecution"
-        @restart_operation_on_run="stopPLanExecution"
-      />
-    </card-component>
-  </main-section>
-  <vue-basic-alert
-    ref="alert"
-    :duration="500"
-    :close-in="5000"
-  />
+      <card-component
+        class="mb-6"
+        title="Clients"
+        :icon="mdiAccountMultiple"
+        has-table
+      >
+        <clients-table
+          v-if="update"
+          checkable
+          :rows="plans"
+          :item-table-columns="plansUpdateFields"
+          items-box="Timers"
+          id-name="name"
+          type-element="plan"
+          :show-items-always="show"
+          :show-radio-buttons1="true"
+          :limit="true"
+          :limit-number="100"
+          @delete="modalDeletePlan"
+          @create="modalCreatePlan"
+          @edit="modalEditPlan"
+          @create_item="modalCreateTimeItem"
+          @create_item_object_creator="modalCreateTimeItemNew"
+          @delete_item="modalDeleteTimeItem"
+          @delete_item_new="modalDeleteTimeItem"
+          @radio_elements="setAllButOneToFalse"
+          @restart_operation="restartPLanExecution"
+          @restart_operation_on_run="stopPLanExecution"
+        />
+      </card-component>
+    </main-section>
+    <vue-basic-alert
+      ref="alert"
+      :duration="500"
+      :close-in="5000"
+    />
+  </div>
 </template>

@@ -95,112 +95,114 @@ const submitPass = () => {
 </script>
 
 <template>
-  <title-bar :title-stack="titleStack" />
-  <main-section>
-    <notification
-      color="warning"
-      :icon="mdiFeather"
-      :outline="notificationsOutline"
-    >
-      <b>Important. 'Current password'</b> must be entered in order to update profile fields
-    </notification>
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <card-component
-        title="Edit Profile"
-        :icon="mdiAccountCircle"
-        form
-        @submit.prevent="submitProfile"
+  <div class="overflow-y-hidden">
+    <title-bar :title-stack="titleStack" />
+    <main-section>
+      <notification
+        color="warning"
+        :icon="mdiFeather"
+        :outline="notificationsOutline"
       >
-        <field
-          v-for="(item, index) in getProfileFields"
-          :key="index"
-          :label="item.column"
-          :help="item.message"
+        <b>Important. 'Current password'</b> must be entered in order to update profile fields
+      </notification>
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <card-component
+          title="Edit Profile"
+          :icon="mdiAccountCircle"
+          form
+          @submit.prevent="submitProfile"
         >
-          <div
-            v-if="item.type === 'password'"
+          <field
+            v-for="(item, index) in getProfileFields"
+            :key="index"
+            :label="item.column"
+            :help="item.message"
           >
-            <control
-              v-model="form[item.field]"
-              :icon="module[item.icon]"
-              :name="item.column"
-              type="password"
-            />
-          </div>
-          <div
-            v-else
-          >
-            <control
-              v-model="form[item.field]"
-              :icon="module[item.icon]"
-              :name="item.column"
-            />
-          </div>
-        </field>
-        <divider />
+            <div
+              v-if="item.type === 'password'"
+            >
+              <control
+                v-model="form[item.field]"
+                :icon="module[item.icon]"
+                :name="item.column"
+                type="password"
+              />
+            </div>
+            <div
+              v-else
+            >
+              <control
+                v-model="form[item.field]"
+                :icon="module[item.icon]"
+                :name="item.column"
+              />
+            </div>
+          </field>
+          <divider />
 
-        <jb-buttons>
-          <jb-button
-            color="info"
-            type="submit"
-            label="Submit"
-          />
-        </jb-buttons>
-      </card-component>
+          <jb-buttons>
+            <jb-button
+              color="info"
+              type="submit"
+              label="Submit"
+            />
+          </jb-buttons>
+        </card-component>
 
-      <card-component
-        title="Change Password"
-        :icon="mdiLock"
-        form
-        @submit.prevent="submitPass"
-      >
-        <field
-          v-for="(item, index) in getChangePasswordFields"
-          :key="index"
-          :label="item.column"
-          :help="item.message"
+        <card-component
+          title="Change Password"
+          :icon="mdiLock"
+          form
+          @submit.prevent="submitPass"
         >
-          <div
-            v-if="item.type === 'password'"
+          <field
+            v-for="(item, index) in getChangePasswordFields"
+            :key="index"
+            :label="item.column"
+            :help="item.message"
           >
-            <control
-              v-model="formPassword[item.field]"
-              :icon="module[item.icon]"
-              :name="item.column"
-              type="password"
-            />
-          </div>
-          <div
-            v-else
-          >
-            <control
-              v-model="formPassword[item.field]"
-              :icon="module[item.icon]"
-              :name="item.column"
-            />
-          </div>
-        </field>
+            <div
+              v-if="item.type === 'password'"
+            >
+              <control
+                v-model="formPassword[item.field]"
+                :icon="module[item.icon]"
+                :name="item.column"
+                type="password"
+              />
+            </div>
+            <div
+              v-else
+            >
+              <control
+                v-model="formPassword[item.field]"
+                :icon="module[item.icon]"
+                :name="item.column"
+              />
+            </div>
+          </field>
 
-        <divider />
+          <divider />
 
-        <jb-buttons>
-          <jb-button
-            type="submit"
-            color="info"
-            label="Submit"
-          />
-          <jb-button
-            color="info"
-            label="Options"
-            outline
-          />
-        </jb-buttons>
-      </card-component>
-    </div>
-  </main-section>
-  <vue-basic-alert
-    ref="alert"
-    :duration="500"
-    :close-in="5000"
-  />
+          <jb-buttons>
+            <jb-button
+              type="submit"
+              color="info"
+              label="Submit"
+            />
+            <jb-button
+              color="info"
+              label="Options"
+              outline
+            />
+          </jb-buttons>
+        </card-component>
+      </div>
+    </main-section>
+    <vue-basic-alert
+      ref="alert"
+      :duration="500"
+      :close-in="5000"
+    />
+  </div>
 </template>
