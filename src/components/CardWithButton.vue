@@ -25,7 +25,7 @@ watch(() => enableEmailNotification.value, () => {
     'Watch props.selected function called with args:' + enableEmailNotification.value)
   alert.value.showAlert(
     'success',
-    'water reset'
+    'email check changed'
   )
 })
 

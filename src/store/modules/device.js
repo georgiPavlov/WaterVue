@@ -48,7 +48,7 @@ const state = {
     {
       column: 'Send Email',
       field: 'send_email',
-      type: 'String',
+      type: 'checkbox',
       readOnly: false,
       create: true,
       initialValue: false
