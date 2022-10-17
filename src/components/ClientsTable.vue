@@ -675,7 +675,7 @@ const showItemsForNewItem = () => {
               />
             </div>
             <div v-else-if="item.type === 'checkbox'">
-              <div v-if="getValueByKey(item.field, row) !== buttonCompareValue">
+              <div v-if="getValueByKey(item.field, row) !== true">
                 <jb-button
                   color="danger"
                 />
