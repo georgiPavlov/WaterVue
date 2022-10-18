@@ -38,7 +38,6 @@ const state = {
       type: 'button',
       readOnly: true,
       create: false,
-      hide: false,
       initialValue: false
     }
   ],

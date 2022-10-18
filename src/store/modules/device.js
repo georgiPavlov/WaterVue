@@ -59,7 +59,7 @@ const state = {
       type: 'checkbox',
       readOnly: true,
       create: false,
-      hide: false,
+      hide: true,
       initialValue: false
     }
   ]
@@ -144,6 +144,7 @@ const actions = {
     const deviceCopy = { ...updDevice }
     delete deviceCopy.water_level
     delete deviceCopy.moisture_level
+    delete deviceCopy.is_connected
     await axios.post(
       baseURL.concat('/gadget_communicator_pull/api/update_device'),
       deviceCopy, options

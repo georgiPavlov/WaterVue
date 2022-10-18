@@ -293,6 +293,10 @@ const convertToReactive = (row) => {
 const initSelectionObj = () => {
   for (const propertyName in props.itemTableColumns) {
     const field = props.itemTableColumns[propertyName].field
+    const hidden = props.itemTableColumns[propertyName].hide
+    if (hidden !== undefined) {
+      continue
+    }
     selectionObj[field] = ''
     selectionObjTemp[field] = ''
   }
@@ -317,6 +321,12 @@ const initCreateObj = () => {
 const filteredEvents = () => {
   return props.itemTableColumns.filter(element => {
     return element.create === true
+  })
+}
+
+const filteredEventsEdit = () => {
+  return props.itemTableColumns.filter(element => {
+    return element.hide === undefined
   })
 }
 
@@ -383,7 +393,7 @@ const showItemsForNewItem = () => {
     @cancel="clickCancelElement"
   >
     <field
-      v-for="(item, index) in itemTableColumns"
+      v-for="(item, index) in filteredEventsEdit()"
       :key="index"
       :label="item.column"
     >
@@ -544,6 +554,7 @@ const showItemsForNewItem = () => {
                     v-model="i[indexItem]"
                     type="time"
                     :read-only="!!item.readOnly"
+                    :hidden="item.hide === true"
                   />
                 </div>
                 <div
