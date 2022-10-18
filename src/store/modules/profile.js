@@ -41,6 +41,7 @@ const state = {
       field: 'first_name',
       message: 'enter your first name',
       icon: 'mdiAccountTie',
+      readOnly: false,
       type: ''
     },
     {
@@ -48,6 +49,7 @@ const state = {
       field: 'last_name',
       message: 'enter your last name',
       icon: 'mdiAccountTie',
+      readOnly: false,
       type: ''
     },
     {
@@ -55,6 +57,7 @@ const state = {
       field: 'username',
       message: 'enter your username',
       icon: 'mdiAccount',
+      readOnly: true,
       type: ''
     },
     {
@@ -62,6 +65,7 @@ const state = {
       field: 'email',
       message: 'enter your email',
       icon: 'mdiAt',
+      readOnly: false,
       type: ''
     }
   ]

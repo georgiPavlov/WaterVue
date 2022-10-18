@@ -135,6 +135,7 @@ const submitPass = () => {
                 v-model="form[item.field]"
                 :icon="module[item.icon]"
                 :name="item.column"
+                :read-only="!!item.readOnly"
               />
             </div>
           </field>
