@@ -119,7 +119,7 @@ const state = {
     },
     {
       column: 'Is Running',
-      field: 'has_been_executed',
+      field: 'is_running',
       type: 'button',
       readOnly: true,
       create: false,
@@ -235,6 +235,10 @@ const actions = {
       if (planCopy.execute_only_once === false) {
         delete planCopy.execute_only_once
       }
+      planCopy.has_been_executed = false
+    }
+    if (planCopy.plan_type === 'moisture') {
+      planCopy.has_been_executed = false
     }
     const response = await axios.post(
       baseURL.concat('/gadget_communicator_pull/api/update_plan'),
