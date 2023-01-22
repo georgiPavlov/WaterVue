@@ -142,6 +142,8 @@ const getValueByKey = (keyName, row) => {
   if (!row) {
     return 'none'
   }
+  // console.log('test32432423 ' + keyName)
+  // console.log(row[keyName])
   return row[keyName]
 }
 
@@ -150,8 +152,8 @@ const confirmClick = (mode, errorsHandler) => {
 }
 
 const confirmClickRadioElements = (mode, modelValue) => {
-  initCreateObj()
   emit(mode, modelValue)
+  initCreateObj()
 }
 
 const confirmClickItem = (mode, index) => {
@@ -168,7 +170,9 @@ const confirmClickItemCreateObject = (mode) => {
 }
 
 const confirmClickCreate = (mode, errorsHandler) => {
+  initCreateObjWithInitial()
   const copy = toRaw(createObj)
+  console.log('aqwerty' + copy)
   emit(mode, copy, errorsHandler)
 }
 
@@ -303,9 +307,15 @@ const initSelectionObj = () => {
 }
 
 const initCreateObj = () => {
+  for (const variableKey in createObj) {
+    console.log('vat key' + variableKey)
+    delete createObj[variableKey]
+  }
+  console.log(JSON.stringify(createObj))
   for (const propertyName in props.itemTableColumns) {
     const field = props.itemTableColumns[propertyName].field
     const initialValue = props.itemTableColumns[propertyName].initialValue
+    console.log('initialValue' + initialValue)
     if (initialValue !== undefined) {
       createObj[field] = initialValue
     } else {
@@ -316,6 +326,19 @@ const initCreateObj = () => {
       }
     }
   }
+}
+
+const initCreateObjWithInitial = () => {
+  console.log('some test123' + JSON.stringify(createObj))
+  for (const propertyName in props.itemTableColumns) {
+    const field = props.itemTableColumns[propertyName].field
+    const initialValue = props.itemTableColumns[propertyName].initialValue
+    console.log('initialValue' + initialValue)
+    if (initialValue !== undefined && field === 'plan_type') {
+      createObj[field] = initialValue
+    }
+  }
+  console.log(' after some test123' + JSON.stringify(createObj))
 }
 
 const filteredEvents = () => {

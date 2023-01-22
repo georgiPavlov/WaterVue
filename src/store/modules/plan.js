@@ -324,7 +324,7 @@ const actions = {
   setPlanOperation ({ commit }, type) {
     commit('setPlanOperation', type)
   },
-  async initCurrentPlans ({ commit }, plans) {
+  initCurrentPlans ({ commit }, plans) {
     commit('minitCurrentPlans', plans)
   },
   async fetchPlans ({ dispatch, commit, getters, rootGetters }) {
