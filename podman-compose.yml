@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  watervue:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: watervue
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./logs:/app/logs
+      - ./src:/app/src
+      - ./public:/app/public
+    environment:
+      - NODE_ENV=development
+      - VITE_API_BASE_URL=http://waterplantapp:8001
+    networks:
+      - waterplant-network
+    restart: unless-stopped
+    depends_on:
+      - waterplantapp
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  waterplant-network:
+    external: true

@@ -14,11 +14,29 @@ The Water Plant Automation System consists of three main components:
 
 ### Prerequisites
 
-- Node.js 16+ and npm
-- Python 3.9+ (for backend components)
-- Git
+- **For Containerized Setup**: Podman and podman-compose
+- **For Local Development**: Node.js 16+, Python 3.9+, Git
 
-### 1. Start the Complete System
+### Option 1: Containerized Setup (Recommended)
+
+From the WaterVue directory, run:
+
+```bash
+./start_containers_simple.sh
+```
+
+This script will:
+- Start all three components in containers
+- Create shared network for communication
+- Set up the database and create a test user
+- Display all access URLs and credentials
+
+**Container Access Points:**
+- Frontend: http://localhost:3001
+- Backend: http://localhost:8001
+- Operator: http://localhost:8000
+
+### Option 2: Local Development
 
 From the WaterVue directory, run:
 
@@ -53,7 +71,9 @@ Open your browser and navigate to: **http://localhost:3000**
 
 | Script | Description |
 |--------|-------------|
-| `./start_complete_system.sh` | Start all three components (backend, frontend, hardware) |
+| `./start_containers_simple.sh` | Start all components in containers (recommended) |
+| `./stop_all_containers.sh` | Stop all containerized services |
+| `./start_complete_system.sh` | Start all three components (local development) |
 | `./stop_complete_system.sh` | Stop all running services |
 | `./check_system_status.sh` | Check the status of all services |
 | `./test_complete_integration.py` | Run integration tests for the complete system |
@@ -69,7 +89,17 @@ Open your browser and navigate to: **http://localhost:3000**
 
 ## 🌐 System URLs
 
-When the system is running, you can access:
+### Containerized Setup
+When running in containers, you can access:
+
+- **Frontend Application**: http://localhost:3001
+- **Backend API**: http://localhost:8001
+- **Admin Panel**: http://localhost:8001/admin/
+- **API Documentation**: http://localhost:8001/gadget_communicator_pull/api/
+- **Hardware Control**: http://localhost:8000
+
+### Local Development Setup
+When running locally, you can access:
 
 - **Frontend Application**: http://localhost:3000
 - **Backend API**: http://localhost:8001
