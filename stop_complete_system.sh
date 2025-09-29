@@ -83,6 +83,11 @@ pkill -f "vite" 2>/dev/null || true
 # Kill WaterPlantOperator processes
 pkill -f "python.*main.py" 2>/dev/null || true
 
+# Stop WaterPlantOperator container
+print_status "Stopping WaterPlantOperator container..."
+podman stop waterplant-operator 2>/dev/null || true
+podman rm waterplant-operator 2>/dev/null || true
+
 # Kill any Node.js processes related to our project
 pkill -f "node.*water-me-automation" 2>/dev/null || true
 

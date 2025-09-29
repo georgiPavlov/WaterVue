@@ -19,7 +19,7 @@ export default new Vuex.Store({
   state: {
     tokenType: 'Bearer ',
     token: '',
-    baseURL: 'http://localhost:8001',
+    baseURL: 'http://localhost:8001', // WaterPlantApp Django Server
     options: {
       headers: {
         Authorization: 'none'

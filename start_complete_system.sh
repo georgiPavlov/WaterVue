@@ -58,6 +58,9 @@ print_status "Cleaning up existing processes..."
 pkill -f "manage.py runserver" 2>/dev/null || true
 pkill -f "vite" 2>/dev/null || true
 pkill -f "python.*main.py" 2>/dev/null || true
+# Stop existing container if running
+podman stop waterplant-operator 2>/dev/null || true
+podman rm waterplant-operator 2>/dev/null || true
 sleep 2
 
 # Function to check if port is in use
@@ -122,7 +125,7 @@ print_success "WaterPlantApp started (PID: $WATERPLANTAPP_PID)"
 
 # Start WaterVue (Frontend)
 print_status "Starting WaterVue (Vue.js Frontend)..."
-cd ../WaterVue
+cd WaterVue
 
 # Check if node_modules exists
 if [ ! -d "node_modules" ]; then
@@ -138,27 +141,31 @@ echo $WATERVUE_PID > ../logs/watervue.pid
 cd ..
 print_success "WaterVue started (PID: $WATERVUE_PID)"
 
-# Start WaterPlantOperator (Hardware Control)
-print_status "Starting WaterPlantOperator (Hardware Control)..."
-cd ../WaterPlantOperator
+# Start WaterPlantOperator (Containerized)
+print_status "Starting WaterPlantOperator (Containerized)..."
+cd WaterPlantOperator
 
-# Check if requirements are installed
-if [ ! -d "venv" ]; then
-    print_status "Setting up WaterPlantOperator virtual environment..."
-    python3 -m venv venv
-    source venv/bin/activate
-    pip install -r requirements.txt 2>/dev/null || print_warning "Some hardware dependencies may not be available on macOS"
-    deactivate
+# Check if container is already running
+if podman ps | grep -q waterplant-operator; then
+    print_status "WaterPlantOperator container is already running"
+    WATERPLANTOPERATOR_PID="container"
+else
+    print_status "Starting WaterPlantOperator container..."
+    # Build and start the container
+    podman build -t waterplant-operator . > /dev/null 2>&1
+    podman run -d --name waterplant-operator -p 8000:8000 \
+        -v ./logs:/app/logs -v ./data:/app/data \
+        waterplant-operator > /dev/null 2>&1
+    print_success "WaterPlantOperator container started"
+    WATERPLANTOPERATOR_PID="container"
 fi
 
-# Start WaterPlantOperator in background
-source venv/bin/activate
-nohup python3 run/main.py > ../logs/waterplantoperator.log 2>&1 &
-WATERPLANTOPERATOR_PID=$!
-echo $WATERPLANTOPERATOR_PID > ../logs/waterplantoperator.pid
-deactivate
 
-cd ../WaterVue
+
+cd ..
+echo $(pwd)
+cd WaterVue
+
 print_success "WaterPlantOperator started (PID: $WATERPLANTOPERATOR_PID)"
 
 # Create logs directory if it doesn't exist
