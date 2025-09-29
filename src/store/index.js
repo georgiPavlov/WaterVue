@@ -19,7 +19,7 @@ export default new Vuex.Store({
   state: {
     tokenType: 'Bearer ',
     token: '',
-    baseURL: 'https://wmeautomation.de:444',
+    baseURL: 'http://localhost:8001',
     options: {
       headers: {
         Authorization: 'none'

@@ -8,7 +8,9 @@ import pluginRewriteAll from 'vite-plugin-rewrite-all'
 // https://vitejs.dev/config/
 export default defineConfig({
   server: {
-    https: true
+    https: false,
+    port: 3000,
+    host: true
   },
   plugins: [
     vue(),

@@ -30,7 +30,7 @@ const actions = {
     }
     const loginParams = getters.getLoginParams
     const response = await axios.post(
-      baseURL.concat('/api/auth/login/'),
+      baseURL.concat('/api-token-auth/'),
       loginParams, options
     ).catch(
       function (error) {
@@ -42,7 +42,7 @@ const actions = {
     if (rootGetters.getErrors !== 'none') {
       return
     }
-    dispatch('setToken', response.data.token)
+    dispatch('setToken', response.data.access)
     dispatch('setIsAuthenticated', response.status)
   }
 }
