@@ -26,3 +26,5 @@ podman rm waterplant-operator 2>/dev/null || true
 echo "Container remove done"
 
 echo "All tests passed!"
+
+
